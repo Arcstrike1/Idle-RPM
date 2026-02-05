@@ -4,7 +4,7 @@ const game ={
     // rubber per click
     // multipliers
     // timers
-    state: [ rubber, rps, rpc, rmulti ],
+    state: { rubber: 0, rps: 0, rpc: 1, rmulti:1 },
     // array or dictionary of building objects
     // each building has:
     // - name
@@ -156,11 +156,17 @@ const game ={
     // load save
     // start game loop
     init() {
-        game.state.rubber = 0;
-        game.state.rps = 1;
-        game.state.rpc = 1;
+  this.state.rubber = 0;
+  this.state.rps = 0;
+  this.state.rpc = 1;
+  this.state.rmulti = 1;
 
-        setInterval(function(){
+  this.startTickLoop();
+  const wheel = document.getElementById("gameWheel");
+  if (wheel) wheel.addEventListener("click", clickWheel);
+
+
+    setInterval(function(){
             game.state.rubber += game.state.rps;
             document.getElementById("rubber-count").innerText=Math.floor(game.state.rubber);
         },1000);
@@ -170,6 +176,38 @@ const game ={
             document.getElementById("rubber-count").innerText = Math.floor(game.state.rubber);
         }
     },
+    calculateTotalRPS() {
+  let total = 0;
+  for (const b of this.buildings) {
+    total += (b.baseRPS || 0) * (b.count || 0);
+  }
+
+  let multiplier = 1;
+  for (const up of this.upgrades) {
+    if (up.purchased && up.rpsMultiplier) multiplier *= up.rpsMultiplier;
+  }
+  for (const buff of this.buffs) {
+    if (buff.type === 'rps' || buff.type === 'global') multiplier *= buff.multiplier;
+  }
+  multiplier *= (this.state.rmulti || 1);
+
+  return total * multiplier;
+},
+
+startTickLoop() {
+  this._lastTick = Date.now();
+  this._tickInterval = setInterval(() => {
+    const now = Date.now();
+    const dt = (now - this._lastTick) / 1000; // seconds
+    this._lastTick = now;
+
+    const rps = this.calculateTotalRPS();
+    this.state.rubber += rps * dt;
+
+    const el = document.getElementById('rubber-count');
+    if (el) el.innerText = Math.floor(this.state.rubber);
+  }, 100); // 100ms tick for smooth updates
+},
     // runs every frame or tick
     // handles:
     // - production

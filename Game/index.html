@@ -6,7 +6,9 @@
     <script src="game.js"></script>
     <link rel="stylesheet" href="style.css">
     <title>Idle-RPM</title>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="game-container">
@@ -21,17 +23,18 @@
             </div>
             <img src="./images/zwalk.gif">
         </div>
+        <div id="buyables" style="width:67%;height: fit-content;">
+            <!-- Buildings Section -->
+            <div id="buildings-section">
+                <h2 style="position:relative;top: -130px; color:azure;">Buildings</h2>
+                <div style="position:relative;top:-125px;" id="buildings-list"></div>
+            </div>
 
-        <!-- Buildings Section -->
-        <div id="buildings-section">
-            <h2>Buildings</h2>
-            <div id="buildings-list"></div>
-        </div>
-
-        <!-- Upgrades Section -->
-        <div id="upgrades-section">
-            <h2>Upgrades</h2>
-            <div id="upgrades-list"></div>
+            <!-- Upgrades Section -->
+            <div id="upgrades-section">
+                <h2 style="position:relative;top: -130px; color:azure;">Upgrades</h2>
+                <div style="position:relative;top:-125px;" id="upgrades-list"></div>
+            </div>
         </div>
     </div>
 </body>

@@ -1,10 +1,20 @@
+*{
+    font-family: "Pixelify Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}
 #gameWheel {
     transition: .25s ease all;
     width: 75%;
     border-radius: 100%;
     position: relative;
 }
-
+body{
+    background-image: url(./images/mainback.svg);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
 /* #gameWheel:hover {
     transition: .5s ease all;
     width: 250px;
@@ -24,22 +34,44 @@
     width:fit-content;
     height: fit-content;
 }
+#buyables{
+    background-image: url(./images/garback.jpg);
+    display: flex;
+}
+#buildings-section{
+    height:100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 10px rgb(128, 56, 42) ridge;
+    
+}
+#upgrades-section{
+    height:100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 10px rgb(128, 56, 42) ridge;
+    
+}
 #buildings-list{
     display: flex;
     flex-direction: column;
     width:200px;
 }
 .building-button{
-    border-radius: 6px;
     border-style: outset;
-    background: conic-gradient(white,grey);
-    margin:15px;
+    border-width: 4px;
+    background-image: url(./images/buttonbackground.png);
+    width:100%;
 }
 .upgrade-button{
-    border-radius: 6px;
     border-style: outset;
-    background: conic-gradient(white,grey);
-    margin:15px;
+    border-width: 4px;
+    background-image: url(./images/buttonbackground.png);
+    width:100%;
 }
 .upgrades-list{
     display: flex;

@@ -216,13 +216,6 @@ const game ={
             const totalRPS = this.calculateTotalRPS();
             this.state.rubber += totalRPS * dt;
 
-            // update UI
-            const el = document.getElementById('rubber-count');
-            if (el) el.innerText = "Total Rubber: "+ Math.floor(this.state.rubber);
-            const el2 = document.getElementById('rps-count');
-            if(el2) el2.innerText = "Rubber per second: "+Math.floor(this.calculateTotalRPS());
-            const el3 = document.getElementById('rpc-count');
-            if(el3) el3.innerText = "Rubber per click: "+Math.floor(this.calculateTotalRPC());
             this.update();
         }, 100); // 100ms tick for smooth fractional accumulation
     },
@@ -233,7 +226,12 @@ const game ={
     // - minigame updates
     // - unlock checks
     update() {
-
+        const el = document.getElementById('rubber-count');
+        if (el) el.innerText = "Total Rubber: "+ Math.floor(this.state.rubber);
+        const el2 = document.getElementById('rps-count');
+        if(el2) el2.innerText = "Rubber per second: "+Math.floor(this.calculateTotalRPS());
+        const el3 = document.getElementById('rpc-count');
+        if(el3) el3.innerText = "Rubber per click: "+Math.floor(this.calculateTotalRPC());
     },
     // updates UI elements:
     // - cookie count

@@ -6,12 +6,12 @@
 }
 #gameWheel {
     transition: .25s ease all;
-    width: 75%;
+    width: 250px;
     border-radius: 100%;
     position: relative;
 }
 body{
-    background-image: url(./images/mainback.svg);
+    background-image: url(./images/mainBack.png);
     background-repeat: no-repeat;
     background-size: cover;
 }
@@ -25,7 +25,7 @@ body{
 #score-area{
     display:block;
     margin-right:50px;
-    border: 5px black inset;
+    border: 10px rgb(128, 56, 42) ridge;
     padding:15px;
     height:100vh;
     background-image:url(./images/wheelbackground.jpg);
@@ -37,6 +37,7 @@ body{
 #buyables{
     background-image: url(./images/garback.jpg);
     display: flex;
+    border: 10px rgb(128, 56, 42) ridge;
 }
 #buildings-section{
     height:100vh;
@@ -88,11 +89,12 @@ body{
 }
 /* Smoke effect styles */
 .smoke {
-    width: 50px;
-    height: 50px;
+    width: 75px;
+    height: 75px;
     background: rgba(228, 226, 226, 0.5);
     border-radius: 50%;
     position: absolute;
+    top:50px;
     animation: disperse 2s ease-out forwards;
     pointer-events: none;
 }

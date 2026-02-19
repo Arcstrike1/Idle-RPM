@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="game.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>Idle-RPM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <div id="score-area">
+            <h1 id="rubber-count" style="text-align: center;background-color: rgba(0, 0, 0, 0.4);color:white;align-self: center;width:113.5%; position: relative; left:-6.75%;"></h1>
+            <h3 id="rps-count" style="text-align: center; background-color: rgba(0, 0, 0, 0.4);color:white; "></h3>
+            <h3 id="rpc-count" style="text-align: center; background-color: rgba(0, 0, 0, 0.4);color:white; "></h3>
+
+            <div id="wheelspace">
+                <div id="smokeSpace"></div>
+                <img id="gameWheel" src="images/clickWheel.png">
+            </div>
+        </div>
+        <div id="buyables" style="width:67%;height: fit-content;">
+            <!-- Buildings Section -->
+            <div id="buildings-section">
+                <h2 style="position:relative;top: -130px; color:azure;">Buildings</h2>
+                <div style="position:relative;top:-125px;" id="buildings-list"></div>
+            </div>
+
+            <!-- Upgrades Section -->
+            <div id="upgrades-section">
+                <h2 style="position:relative;top: -130px; color:azure;">Upgrades</h2>
+                <div style="position:relative;top:-125px;" id="upgrades-list"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,27 +1,100 @@
+*{
+    font-family: "Pixelify Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}
 #gameWheel {
     transition: .25s ease all;
-    width: 200px;
+    width: 250px;
     border-radius: 100%;
     position: relative;
 }
-
-#gameWheel:hover {
+body{
+    background-image: url(./images/mainBack.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+/* #gameWheel:hover {
     transition: .5s ease all;
     width: 250px;
+} */
+#game-container{
+    display:flex;
 }
-
+#score-area{
+    display:block;
+    margin-right:50px;
+    border: 10px rgb(128, 56, 42) ridge;
+    padding:15px;
+    height:100vh;
+    background-image:url(./images/wheelbackground.jpg);
+}
 #smokeSpace{
     width:fit-content;
     height: fit-content;
 }
-
+#buyables{
+    background-image: url(./images/garback.jpg);
+    display: flex;
+    border: 10px rgb(128, 56, 42) ridge;
+}
+#buildings-section{
+    height:100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 10px rgb(128, 56, 42) ridge;
+    
+}
+#upgrades-section{
+    height:100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 10px rgb(128, 56, 42) ridge;
+    
+}
+#buildings-list{
+    display: flex;
+    flex-direction: column;
+    width:200px;
+}
+.building-button{
+    border-style: outset;
+    border-width: 4px;
+    background-image: url(./images/buttonbackground.png);
+    width:100%;
+}
+.upgrade-button{
+    border-style: outset;
+    border-width: 4px;
+    background-image: url(./images/buttonbackground.png);
+    width:100%;
+}
+.upgrades-list{
+    display: flex;
+    flex-direction: column;
+    width:200px;
+}
+.building-button:hover{
+    transition: .5s ease all;
+    transform: scale(1.1);
+}
+.upgrade-button:hover{
+    transition: .5s ease all;
+    transform: scale(1.1);
+}
 /* Smoke effect styles */
 .smoke {
-    width: 50px;
-    height: 50px;
-    background: rgba(128, 128, 128, 0.5);
+    width: 75px;
+    height: 75px;
+    background: rgba(228, 226, 226, 0.5);
     border-radius: 50%;
     position: absolute;
+    top:50px;
     animation: disperse 2s ease-out forwards;
     pointer-events: none;
 }

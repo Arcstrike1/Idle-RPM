@@ -67,12 +67,10 @@ const game ={
             baseCost: 250,
             unlocked:false,
             purchased:false,
+            rpsMultiplier: 2,
             unlockCondition(){
-                return buildings[1].count >= 1;
+                return game.buildings[1].count >= 1;
             }, 
-            effect(){
-                game.state.rps *= 2;
-            }
         },
         {
             name: "Suspension",
@@ -80,12 +78,10 @@ const game ={
             baseCost: 500,
             unlocked: false,
             purchased:false,
+            rpsMultiplier: 1.5,
             unlockCondition(){
-                return buildings[1].count >=10;
+                return game.buildings[1].count >=10;
             },
-            effect(){
-                game.state.rps += game.state.rps *.10;
-            }
         },
         {
             name: "Drag Slicks",
@@ -93,12 +89,10 @@ const game ={
             baseCost: 1000,
             unlocked:false,
             purchased:false,
+            rpcMultiplier:2,
             unlockCondition(){
-                return buildings[3].count >= 5;
+                return game.buildings[3].count >= 5;
             },
-            effect(){
-                game.state.rpc += game.state.rpc * .25;
-            }
         },
         {
             name: "Active Aero",
@@ -106,12 +100,10 @@ const game ={
             baseCost: 1500,
             unlocked: false,
             purchased:false,
+            rpsMultiplier:1.25,
             unlockCondition(){
-                return buildings[4].count >= 3;
+                return game.buildings[4].count >= 3;
             },
-            effect(){
-                game.state.rps += game.state.rps *.25;
-            }
         },
         {
             name: "Turbo",
@@ -119,13 +111,12 @@ const game ={
             baseCost:2000,
             unlocked: false,
             purchased: false,
+            rpcMultiplier:1.15,
+            rpsMultiplier:1.20,
             unlockCondition(){
-                return buildings[5].count >= 5;
+                return game.buildings[5].count >= 5;
             },
-            effect(){
-                game.state.rps += game.state.rps *.20;
-                game.state.rpc += game.state.rpc *.15;
-            }
+            
         }
     ],
     // list of achievement objects
@@ -156,25 +147,84 @@ const game ={
     // load save
     // start game loop
     init() {
-  this.state.rubber = 0;
-  this.state.rps = 0;
-  this.state.rpc = 1;
-  this.state.rmulti = 1;
+        console.log("Initializing game state...");
+        this.state = {
+            rubber: 0,
+            rps: 1,
+            rpc: 1,
+            rmulti: 1
+        };
+        this.render();
+        this.startTickLoop();
 
-  this.startTickLoop();
-  const wheel = document.getElementById("gameWheel");
-  if (wheel) wheel.addEventListener("click", clickWheel);
-
-
-    setInterval(function(){
-            game.state.rubber += game.state.rps;
-            document.getElementById("rubber-count").innerText=Math.floor(game.state.rubber);
-        },1000);
-
-        function clickWheel(){
-            game.state.rubber += game.state.rpc;
-            document.getElementById("rubber-count").innerText = Math.floor(game.state.rubber);
+        const wheel = document.getElementById("gameWheel");
+        if(wheel) wheel.addEventListener("click", this.clickWheel.bind(this));
+    },
+    // calculate total RPS from buildings and modifiers
+    calculateTotalRPS() {
+        let total = 0;
+        for (const b of this.buildings) {
+            total += (b.baseRPS ) * (b.count );
         }
+
+        // apply upgrade effects
+        let multiplier = 1;
+        for (const up of this.upgrades) {
+            if (up.purchased && up.rpsMultiplier) multiplier += up.rpsMultiplier;
+        }
+
+        // apply active buffs
+        for (const buff of this.buffs) {
+            if (buff.type === 'rps') multiplier += buff.multiplier;
+            if (buff.type === 'global') multiplier += buff.multiplier;
+        }
+
+
+        return total * multiplier;
+    },
+    // Calculate total RPC (Rubber Per Click) from base value, upgrades, and buffs
+    calculateTotalRPC() {
+        let totalRPC = this.state.rpc; // Base RPC
+
+        // Apply upgrade effects
+        for (const up of this.upgrades) {
+            if (up.purchased && up.rpcMultiplier) {
+                totalRPC *= up.rpcMultiplier;
+            }
+        }
+
+        // Apply active buffs
+        for (const buff of this.buffs) {
+            if (buff.type === 'click' || buff.type === 'global') {
+                totalRPC *= buff.multiplier;
+            }
+        }
+
+        // Apply global state multiplier (e.g., prestige)
+        totalRPC *= this.state.rmulti || 1;
+
+        return totalRPC;
+    },
+    // tick loop using dt (call once in init)
+    startTickLoop() {
+        this._lastTick = Date.now();
+        setInterval(() => {
+            const now = Date.now();
+            const dt = (now - this._lastTick) / 1000; // seconds
+            this._lastTick = now;
+
+            const totalRPS = this.calculateTotalRPS();
+            this.state.rubber += totalRPS * dt;
+
+            // update UI
+            const el = document.getElementById('rubber-count');
+            if (el) el.innerText = "Total Rubber: "+ Math.floor(this.state.rubber);
+            const el2 = document.getElementById('rps-count');
+            if(el2) el2.innerText = "Rubber per second: "+Math.floor(this.calculateTotalRPS());
+            const el3 = document.getElementById('rpc-count');
+            if(el3) el3.innerText = "Rubber per click: "+Math.floor(this.calculateTotalRPC());
+            this.update();
+        }, 100); // 100ms tick for smooth fractional accumulation
     },
     calculateTotalRPS() {
   let total = 0;
@@ -215,11 +265,6 @@ startTickLoop() {
     // - minigame updates
     // - unlock checks
     update() {
-        for (const upgrade of Game.upgrades) {
-            if (!upgrade.unlocked && upgrade.unlockCondition()) {
-                upgrade.unlocked = true;
-            }
-        }
 
     },
     // updates UI elements:
@@ -227,7 +272,50 @@ startTickLoop() {
     // - building buttons
     // - upgrade buttons
     // - achievement popups
-    render() {},
+    render() {
+    // Render Buildings
+    const buildingsList = document.getElementById("buildings-list");
+    buildingsList.innerHTML = ""; // Clear previous
+
+    for (let i = 0; i < this.buildings.length; i++) {
+        const building = this.buildings[i];
+        const button = document.createElement("button");
+        button.id = `building-${i}`;
+        button.innerHTML = `
+            <strong>${building.name}</strong><br>
+            Cost: ${building.baseCost}<br>
+            Production: ${building.baseRPS}/s<br>
+            Owned: ${building.count}
+        `;
+        button.onclick = () => this.buyBuilding(i);
+        button.classList.add("building-button");
+        buildingsList.appendChild(button);
+    }
+
+    // Render Upgrades
+    const upgradesList = document.getElementById("upgrades-list");
+    upgradesList.innerHTML = ""; // Clear previous
+    for (const upgrade of this.upgrades) {
+            if (!upgrade.unlocked && upgrade.unlockCondition()) {
+                upgrade.unlocked = true;
+            }
+        }
+    for (let i = 0; i < this.upgrades.length; i++) {
+        const upgrade = this.upgrades[i];
+        if (upgrade.unlocked && !upgrade.purchased ) {
+            const button = document.createElement("button");
+            button.id = `upgrade-${i}`;
+            button.innerHTML = `
+                <strong>${upgrade.name}</strong><br>
+                ${upgrade.description}<br>
+                Cost: ${upgrade.baseCost}
+            `;
+            button.onclick = () => this.buyUpgrade(i);
+            button.classList.add("upgrade-button");
+            upgradesList.appendChild(button);
+        }
+    }
+},
     // calculate building cost
     // calculate building production
     // buy building
@@ -256,47 +344,72 @@ startTickLoop() {
     // formatting numbers
     // random helpers
     // math helpers
-    utils: {}
-};
+    utils: {},
+    buyBuilding(index) {
+    const building = this.buildings[index];
+    if (this.state.rubber >= building.baseCost) {
+        this.state.rubber -= building.baseCost;
+        building.count++;
+        this.render();
+    } else {
+        console.log("Not enough rubber!");
+    }
+    },
+    buyUpgrade(index){
+        const upgrade = this.upgrades[index];
+        if(this.state.rubber >=upgrade.baseCost){
+            this.state.rubber -= upgrade.baseCost;
+            upgrade.purchased = true;
+            this.render();
+        }else{
+            console.log("Not enough rubber!");
+        }
+    },
+    clickWheel() {
+        if (!this.state) {
+        console.error("Game state is not initialized.");
+        return;
+    }
+        const wheel = document.getElementById("gameWheel");
 
-function clickWheel() {
-    const wheel = document.getElementById("gameWheel");
+        // Spin the wheel
+        wheel.style.transition = "transform 0.5s ease";
+        wheel.style.transform += "rotate(360deg)";
 
-    // Spin the wheel
-    wheel.style.transition = "transform 0.5s ease";
-    wheel.style.transform += "rotate(360deg)";
+        // Create smoke effect
+        const smoke = document.createElement("div");
+        smoke.classList.add("smoke");
 
-    // Create smoke effect
-    const smoke = document.createElement("div");
-    smoke.classList.add("smoke");
+        // Position the smoke behind the wheel
+        const wheelRect = wheel.getBoundingClientRect();
+        smoke.style.position = "absolute";
+        smoke.style.left = `${wheelRect.left + wheelRect.width / 3.5}px`;
+        smoke.style.top = `${wheelRect.top + wheelRect.height / 2}px`;
+        smoke.style.transform = "translate(-50%, -50%)";
 
-    // Position the smoke behind the wheel
-    const wheelRect = wheel.getBoundingClientRect();
-    smoke.style.position = "absolute";
-    smoke.style.left = `${wheelRect.left + wheelRect.width / 3.5}px`;
-    smoke.style.top = `${wheelRect.top + wheelRect.height / 2}px`;
-    smoke.style.transform = "translate(-50%, -50%)";
+        // Append smoke to the smoke space
+        const smokeSpace = document.getElementById("smokeSpace");
+        smokeSpace.appendChild(smoke);
 
-    // Append smoke to the smoke space
-    const smokeSpace = document.getElementById("smokeSpace");
-    smokeSpace.appendChild(smoke);
+        // Remove smoke after animation
+        setTimeout(() => {
+            smoke.remove();
+        }, 2000);
 
-    // Remove smoke after animation
-    setTimeout(() => {
-        smoke.remove();
-    }, 2000);
-
-    // Increment rubber count
-    game.state.rubber += game.state.rpc;
-    document.getElementById("rubber-count").innerText = Math.floor(game.state.rubber);
-}
-
-// Bind the click event to the wheel
-window.onload = function() {
-    const wheel = document.getElementById("gameWheel");
-    if (wheel) {
-        wheel.addEventListener("click", clickWheel);
+        // Increment rubber count
+        this.state.rubber += this.calculateTotalRPC();
     }
 };
+window.onload = function() {
 
-//game.init();
+    game.init();
+    const wheel = document.getElementById("gameWheel");
+    wheel.addEventListener("mouseover",()=>{
+            wheel.style.transition = "0.5s ease all",
+            wheel.style.transform = "scale(1.2)"
+    });
+    wheel.addEventListener("mouseout",()=>{
+        wheel.style.transition = "0.5s ease all",
+        wheel.style.transform = "scale(1)"
+    });
+};

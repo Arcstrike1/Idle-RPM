@@ -11,14 +11,28 @@
 <body>
     <div id="game-container">
         <div id="score-area">
-            <h1 id="rubber-count"></h1>
+            <h1 id="rubber-count" style="text-align: center;background-color: rgba(0, 0, 0, 0.4);color:white;align-self: center;width:113.5%; position: relative; left:-6.75%;"></h1>
+            <h3 id="rps-count" style="text-align: center; background-color: rgba(0, 0, 0, 0.4);color:white; "></h3>
+            <h3 id="rpc-count" style="text-align: center; background-color: rgba(0, 0, 0, 0.4);color:white; "></h3>
+
+            <div id="wheelspace">
+                <div id="smokeSpace"></div>
+                <img id="gameWheel" src="images/clickWheel.png">
+            </div>
+            <img src="./images/zwalk.gif">
         </div>
 
-        <div id="wheelspace">
-            <div id="smokeSpace"></div>
-            <img id="gameWheel" src="images/clickWheel.png">
+        <!-- Buildings Section -->
+        <div id="buildings-section">
+            <h2>Buildings</h2>
+            <div id="buildings-list"></div>
         </div>
-        
+
+        <!-- Upgrades Section -->
+        <div id="upgrades-section">
+            <h2>Upgrades</h2>
+            <div id="upgrades-list"></div>
+        </div>
     </div>
 </body>
 </html>

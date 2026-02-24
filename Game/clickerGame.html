@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="auth.js"></script>
+    <script>
+        // Redirect to login if not authenticated
+        if(typeof requireLogin === 'function'){
+            requireLogin();
+        }
+    </script>
     <script src="game.js"></script>
     <link rel="stylesheet" href="style.css">
     <title>Idle-RPM</title>

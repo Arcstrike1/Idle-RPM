@@ -3,14 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="auth.js"></script>
-    <script>
-        // Redirect to login if not authenticated
-        if(typeof requireLogin === 'function'){
-            requireLogin();
-        }
-    </script>
-    <script src="game.js"></script>
+    <script src="./js/app.js"></script>
     <link rel="stylesheet" href="style.css">
     <title>Idle-RPM</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,9 +13,9 @@
 <body>
     <div id="game-container">
         <div id="score-area">
-            <h1 id="rubber-count" style="text-align: center;background-color: rgba(0, 0, 0, 0.4);color:white;align-self: center;width:113.5%; position: relative; left:-6.75%;"></h1>
-            <h3 id="rps-count" style="text-align: center; background-color: rgba(0, 0, 0, 0.4);color:white; "></h3>
-            <h3 id="rpc-count" style="text-align: center; background-color: rgba(0, 0, 0, 0.4);color:white; "></h3>
+            <h1 id="rubber-count" style="text-align: center;background-color: rgba(0, 0, 0, 0.4);color:azure;align-self: center;width:113.5%; position: relative; left:-6.75%;"></h1>
+            <h3 id="rps-count" style="text-align: center; background-color: rgba(0, 0, 0, 0.4);color:azure; "></h3>
+            <h3 id="rpc-count" style="text-align: center; background-color: rgba(0, 0, 0, 0.4);color:azure; "></h3>
 
             <div id="wheelspace">
                 <div id="smokeSpace"></div>

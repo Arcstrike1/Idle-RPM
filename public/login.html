@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login/signup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/formStyle.css">
+</head>
+<body>
+       <div class="Header">
+        <h1>WELCOME TO IDLE RPM</h1>
+       </div>
+
+       <div class="auth-container">
+           <div class="auth-box">
+               <h2>Login</h2>
+               <form id="loginForm">
+                   <label for="username">Username</label>
+                   <input id="username" name="username" type="text" >
+
+                   <label for="password">Password</label>
+                   <input id="password" name="password" type="password" >
+
+                   <button type="submit">Login</button>
+               </form>
+               <div id="loginMessage" class="auth-message"></div>
+               <p>Don't have an account? <a href="signup">Sign up</a></p>
+           </div>
+       </div>
+    <script>
+        document.getElementById("loginForm").addEventListener('submit', async (e)=>{
+            e.preventDefault();
+            const messageDiv = document.getElementById('loginMessage');
+            messageDiv.textContent = '';
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try{
+                const response = await fetch('/users/login',{
+                    method: 'POST',
+                    headers: {'Content-type': 'application/json'},
+                    body: JSON.stringify({username,password})
+                });
+
+                const data = await response.json();
+
+                if(response.ok){
+                    messageDiv.style.color = 'green';
+                    messageDiv.textContent = data.message;
+                    window.location.href = 'clickerGame.html';
+                } else {
+                    messageDiv.style.color = 'red';
+                    messageDiv.textContent = data.error || 'An error occurred';
+                }
+            }catch (error) {
+                messageDiv.style.color = 'red';
+                messageDiv.textContent = 'Connection error. Please try again.';
+            }
+        });
+    </script>
+</body>
+</html>

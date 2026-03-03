@@ -154,11 +154,16 @@ const game ={
             rpc: 1,
             rmulti: 1
         };
+        // load any existing save (local or merged server)
+        this.load();
         this.render();
         this.startTickLoop();
 
         const wheel = document.getElementById("gameWheel");
         if(wheel) wheel.addEventListener("click", this.clickWheel.bind(this));
+
+        // autosave every 30 seconds
+        setInterval(() => this.save(true), 30000);
     },
     // calculate total RPS from buildings and modifiers
     calculateTotalRPS() {
@@ -305,8 +310,55 @@ const game ={
     // serialize game state
     // save to localStorage
     // load from localStorage
-    save() {},
-    load() {},
+    save(saveToServer=true) {
+        // serialize minimal state
+        const data = {
+            state: this.state,
+            buildings: this.buildings.map(b => ({ count: b.count })),
+            upgrades: this.upgrades.map(u => ({ purchased: u.purchased })),
+            buffs: this.buffs
+        };
+        // localStorage copy
+        try {
+            localStorage.setItem('idleRPM_save', JSON.stringify(data));
+        } catch (e) {
+            console.warn('localStorage save failed', e);
+        }
+        // optionally send to server if logged in
+        if (saveToServer) {
+            fetch('/users/save', {
+                method: 'POST',
+                headers: { 'Content-Type':'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ save: data })
+            }).catch(err=>console.warn('server save failed', err));
+        }
+    },
+    load() {
+        // load from localStorage first
+        try {
+            const s = localStorage.getItem('idleRPM_save');
+            if (s) {
+                const obj = JSON.parse(s);
+                if (obj.state) this.state = obj.state;
+                if (Array.isArray(obj.buildings)){
+                    for (let i=0;i<this.buildings.length;i++){
+                        if (obj.buildings[i] && typeof obj.buildings[i].count==='number'){
+                            this.buildings[i].count = obj.buildings[i].count;
+                        }
+                    }
+                }
+                if (Array.isArray(obj.upgrades)){
+                    for (let i=0;i<this.upgrades.length && i<obj.upgrades.length;i++){
+                        if (obj.upgrades[i] && typeof obj.upgrades[i].purchased==='boolean'){
+                            this.upgrades[i].purchased = obj.upgrades[i].purchased;
+                        }
+                    }
+                }
+                if (Array.isArray(obj.buffs)) this.buffs = obj.buffs;
+            }
+        } catch(e){console.warn('localStorage load failed',e);}
+    },
     // formatting numbers
     // random helpers
     // math helpers
@@ -366,9 +418,40 @@ const game ={
         this.state.rubber += this.calculateTotalRPC();
     }
 };
-window.onload = function() {
-
+window.onload = async function() {
     game.init();
+    // try to fetch server-side save for logged-in user
+    try {
+        const res = await fetch('/users/save');
+        if (res.ok) {
+            const data = await res.json();
+            if (data.save) {
+                const s = data.save;
+                // merge state
+                if (s.state) game.state = Object.assign({}, game.state, s.state);
+                // buildings: set counts if present
+                if (Array.isArray(s.buildings)){
+                    for (let i=0;i<game.buildings.length;i++){
+                        if (s.buildings[i] && typeof s.buildings[i].count === 'number'){
+                            game.buildings[i].count = s.buildings[i].count;
+                        }
+                    }
+                }
+                // upgrades: set purchased flags if present
+                if (Array.isArray(s.upgrades)){
+                    for (let i=0;i<game.upgrades.length && i<s.upgrades.length;i++){
+                        if (s.upgrades[i] && typeof s.upgrades[i].purchased === 'boolean'){
+                            game.upgrades[i].purchased = s.upgrades[i].purchased;
+                        }
+                    }
+                }
+                // buffs
+                if (Array.isArray(s.buffs)) game.buffs = s.buffs;
+            }
+        }
+    } catch (err) {
+        console.warn('Could not load server save:', err);
+    }
     const wheel = document.getElementById("gameWheel");
     wheel.addEventListener("mouseover",()=>{
             wheel.style.transition = "0.5s ease all",

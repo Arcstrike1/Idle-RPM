@@ -11,9 +11,11 @@
     position: relative;
 }
 body{
-    background-image: url(../Game/images/mainBack.png);
+    background-image: url(/Game/images/mainBack.svg);
+    background-color: (96, 187, 255);
     background-repeat: no-repeat;
     background-size: cover;
+    background-position: center;
 }
 /* #gameWheel:hover {
     transition: .5s ease all;
@@ -28,14 +30,14 @@ body{
     border: 10px rgb(128, 56, 42) ridge;
     padding:15px;
     height:100vh;
-    background-image:url(../Game/images/wheelbackground.jpg);
+    background-image:url(/Game/images/wheelbackground.jpg);
 }
 #smokeSpace{
     width:fit-content;
     height: fit-content;
 }
 #buyables{
-    background-image: url(../Game/images/garback.jpg);
+    background-image: url(/Game/images/garback.jpg);
     display: flex;
     border: 10px rgb(128, 56, 42) ridge;
 }
@@ -65,13 +67,13 @@ body{
 .building-button{
     border-style: outset;
     border-width: 4px;
-    background-image: url(../Game/images/buttonbackground.png);
+    background-image: url(/Game/images/buttonbackground.png);
     width:100%;
 }
 .upgrade-button{
     border-style: outset;
     border-width: 4px;
-    background-image: url(../Game/images/buttonbackground.png);
+    background-image: url(/Game/images/buttonbackground.png);
     width:100%;
 }
 .upgrades-list{
@@ -109,35 +111,3 @@ body{
         transform: scale(3);
     }
 }
-
-/* Auth form styles */
-.auth-container{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:70vh;
-}
-.auth-box{
-    background: rgba(0,0,0,0.6);
-    padding:20px;
-    border: 6px solid rgba(128,56,42,0.9);
-    width:320px;
-    color: white;
-    border-radius:6px;
-}
-.auth-box h2{ text-align:center; margin-top:0; }
-.auth-box label{ display:block; margin-top:8px; font-size:0.9rem; }
-.auth-box input{ width:100%; padding:8px; margin-top:6px; border:2px solid #222; border-radius:4px; }
-.auth-box button{ margin-top:12px; width:100%; padding:10px; background:#6b6; border:none; cursor:pointer; font-weight:bold; }
-.auth-message{ margin-top:8px; color: #ffd; min-height:20px; }
-
-
-/* Header centering */
-.Header{
-    text-align: center;
-    margin-top: 16px;
-}
-.Header h1{
-    margin: 0;
-}
-

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Idle RPM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/formStyle.css">
+</head>
+<body>
+    <div class="Header">
+        <h1>Create an Account</h1>
+    </div>
+
+    <div class="auth-container">
+        <div class="auth-box">
+            <h2>Sign Up</h2>
+            <form id="signupForm">
+                <label for="su-username">Username</label>
+                <input id="su-username" name="username" type="text" >
+
+                <label for="su-email">Email</label>
+                <input id="su-email" name="email" type="email">
+
+                <label for="su-password">Password</label>
+                <input id="su-password" name="password" type="password" >
+
+                <label for="su-password2">Confirm Password</label>
+                <input id="su-password2" name="password2" type="password" >
+
+                <button type="submit">Create Account</button>
+            </form>
+            <div id="signupMessage" class="auth-message"></div>
+            <p>Already have an account? <a href="/">Login</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const messageDiv = document.getElementById('signupMessage');
+            messageDiv.textContent = '';
+            
+            const username = document.getElementById('su-username').value;
+            const email = document.getElementById('su-email').value;
+            const password = document.getElementById('su-password').value;
+            const password2 = document.getElementById('su-password2').value;
+            
+            try {
+                const response = await fetch('/users/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password, password2 })
+                });
+                
+                const data = await response.json();
+                
+                if(response.ok) {
+                    messageDiv.style.color = 'green';
+                    messageDiv.textContent = data.message;
+                    window.location.href-'login.html';
+                } else {
+                    messageDiv.style.color = 'red';
+                    messageDiv.textContent = data.error || 'An error occurred';
+                }
+            } catch (error) {
+                messageDiv.style.color = 'red';
+                messageDiv.textContent = 'Connection error. Please try again.';
+            }
+        });
+    </script>
+</body>
+</html>

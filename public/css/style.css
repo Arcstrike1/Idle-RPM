@@ -70,6 +70,15 @@ body{
     background-image: url(/Game/images/buttonbackground.png);
     width:100%;
 }
+.nav-button{
+    border-style: outset;
+    border-width: 4px;
+    background-image: url(/Game/images/buttonbackground.png);
+}
+.nav-button:hover{
+    transition: .5s ease all;
+    transform: scale(1.1);
+}
 .upgrade-button{
     border-style: outset;
     border-width: 4px;

@@ -55,6 +55,11 @@ const signup = async (req, res) =>{
         let username = req.body.username;
         let email = req.body.email;
 
+        const existingUser = await queries.getUserByUsername(username);
+
+        if(existingUser){
+          return res.status(400).json({error: 'User already exists'});
+        }
         
         if(!username) return res.status(400).json({ error: 'Username is required' });
         if(!email) return res.status(400).json({ error: 'Email is required' });

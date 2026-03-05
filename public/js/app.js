@@ -1,3 +1,4 @@
+const queries = require("../../Game/queries/dbQueries");
 const game ={
     // total rubber / currency
     // rubber per second
@@ -335,9 +336,9 @@ const game ={
         }
     },
     load() {
-        // load from localStorage first
+        
         try {
-            const s = localStorage.getItem('idleRPM_save');
+            const s = queries.getSaveByUserId(id);
             if (s) {
                 const obj = JSON.parse(s);
                 if (obj.state) this.state = obj.state;

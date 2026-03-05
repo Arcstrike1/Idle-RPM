@@ -13,6 +13,12 @@
 <body>
     <div id="game-container">
         <div id="score-area">
+            <div id="nav" style="display: inline;">
+                <button id="logoutButton" class="nav-button">Logout</button>
+                <button id="friendsButton" class="nav-button">Friends</button>
+                <button id="addFriendButton" class="nav-button">Add Friend</button>
+                <button id="raceButton" class="nav-button">Start Race</button>
+            </div>
             <h1 id="rubber-count" style="text-align: center;background-color: rgba(0, 0, 0, 0.4);color:azure;align-self: center;width:113.5%; position: relative; left:-6.75%;"></h1>
             <h3 id="rps-count" style="text-align: center; background-color: rgba(0, 0, 0, 0.4);color:azure; "></h3>
             <h3 id="rpc-count" style="text-align: center; background-color: rgba(0, 0, 0, 0.4);color:azure; "></h3>
@@ -22,6 +28,7 @@
                 <img id="gameWheel" src="../Game/images/clickWheel.png">
             </div>
         </div>
+        
         <div id="buyables" style="width:fit-content;min-width:50%;height: fit-content;">
             <!-- Buildings Section -->
             <div id="buildings-section">
@@ -43,4 +50,9 @@
         </div>
     </div>
 </body>
+<script>
+    document.getElementById('logoutButton').addEventListener('click', () => {
+  window.location.href = '/logout';
+});
+</script>
 </html>

@@ -31,4 +31,5 @@ async function upsertSave(userId, data, slot='auto'){
     await promisePool.query('INSERT INTO game_saves (user_id, slot_name, data) VALUES (?,?,?)', [userId, slot, JSON.stringify(data)]);
   }
 }
+
 module.exports = { getUsers , insertUser, getUserByEmail, getUserByUsername, getSaveByUserId, upsertSave };

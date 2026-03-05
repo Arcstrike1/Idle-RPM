@@ -38,6 +38,16 @@ app.get('/', (req, res) => {
 app.get('/signup',(req,res)=> {
     res.sendFile(path.join(__dirname,'public','signup.html'));
 })
+app.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Session destruction error:', err);
+      return res.status(500).send('Could not log out.');
+    }
+    res.clearCookie('connect.sid'); 
+    res.redirect('/');
+  });
+});
 app.listen(PORT, () => {
   console.log(`Server listening on port http://localhost:${PORT}/`);
 });

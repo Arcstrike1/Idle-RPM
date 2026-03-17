@@ -1,4 +1,4 @@
-const queries = require("../../Game/queries/dbQueries");
+
 const game ={
     // total rubber / currency
     // rubber per second
@@ -335,10 +335,16 @@ const game ={
             }).catch(err=>console.warn('server save failed', err));
         }
     },
-    load() {
+    async load() {
         
         try {
-            const s = queries.getSaveByUserId(id);
+            const res = await fetch("/users/save", {
+            method: "GET",
+            credentials: "include"
+            });
+
+            const s = await res.json();
+
             if (s) {
                 const obj = JSON.parse(s);
                 if (obj.state) this.state = obj.state;
@@ -358,7 +364,7 @@ const game ={
                 }
                 if (Array.isArray(obj.buffs)) this.buffs = obj.buffs;
             }
-        } catch(e){console.warn('localStorage load failed',e);}
+        } catch(e){console.warn('database storage load failed',e);}
     },
     // formatting numbers
     // random helpers

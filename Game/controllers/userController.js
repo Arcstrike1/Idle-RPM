@@ -1,5 +1,7 @@
-const bcrypt = require('bcryptjs');
-const queries = require("../queries/dbQueries");
+
+import bcrypt from 'bcryptjs';
+
+import queries from "../queries/dbQueries.js";
 
 
 const login = async (req, res) => {
@@ -78,4 +80,8 @@ const signup = async (req, res) =>{
     }
 }
 
-module.exports = {signup , login, getSave, saveGame};
+export default  {
+  signup ,
+   login,
+    getSave,
+     saveGame};

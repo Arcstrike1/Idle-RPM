@@ -327,6 +327,7 @@ const game ={
         }
         // optionally send to server if logged in
         if (saveToServer) {
+            console.log("Saving to server")
             fetch('/users/save', {
                 method: 'POST',
                 headers: { 'Content-Type':'application/json' },
@@ -346,7 +347,7 @@ const game ={
             const s = await res.json();
 
             if (s) {
-                const obj = JSON.parse(s);
+                const obj = s.save;
                 if (obj.state) this.state = obj.state;
                 if (Array.isArray(obj.buildings)){
                     for (let i=0;i<this.buildings.length;i++){

@@ -27,7 +27,7 @@ const login = async (req, res) => {
 
 const getSave = async (req, res) => {
   try {
-    const userId = req.session && req.session.userId;
+    const userId = req.session?.userId;
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
     const data = await queries.getSaveByUserId(userId);
     return res.json({ save: data });
@@ -39,7 +39,7 @@ const getSave = async (req, res) => {
 
 const saveGame = async (req, res) => {
   try {
-    const userId = req.session && req.session.userId;
+    const userId = req.session?.userId;
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
     const payload = req.body.save || req.body;
     await queries.upsertSave(userId, payload);

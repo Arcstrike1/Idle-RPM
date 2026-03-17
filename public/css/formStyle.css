@@ -17,6 +17,9 @@ body{
     background-size: cover;
     background-position: center;
 }
+a{
+    color:rgba(96, 187, 255);
+}
 .auth-box{
     background: rgba(0,0,0,0.6);
     padding:20px;

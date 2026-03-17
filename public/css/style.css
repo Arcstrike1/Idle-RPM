@@ -29,7 +29,7 @@ body{
     margin-right:50px;
     border: 10px rgb(128, 56, 42) ridge;
     padding:15px;
-    height:100vh;
+    height:90vh;
     background-image:url(/Game/images/wheelbackground.jpg);
 }
 #smokeSpace{
@@ -42,7 +42,7 @@ body{
     border: 10px rgb(128, 56, 42) ridge;
 }
 #buildings-section{
-    height:100vh;
+    height:90vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -51,7 +51,7 @@ body{
     
 }
 #upgrades-section{
-    height:100vh;
+    height:90vh;
     display: flex;
     flex-direction: column;
     justify-content: center;

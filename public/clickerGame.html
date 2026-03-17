@@ -48,11 +48,39 @@
                 <div style="position:relative;top:-125px;" id="upgrades-list"></div>
             </div>
         </div>
+        <h1 id="userName"></h1>
     </div>
+    
 </body>
-<script>
+<script type="module">
+    let userInfo = null;
+
+    try {
+        const res = await fetch('/users/userInfo', {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (!res.ok) {
+            console.error("User not logged in");
+        } else {
+            userInfo = await res.json();
+        }
+    } catch (e) {
+        console.error("Couldn't get user info", e);
+    }
+
+    const userName = document.getElementById("userName");
+
+    if (userInfo && userInfo.userName) {
+        userName.innerHTML = `${userInfo.userName}'s Garage`;
+    } else {
+        userName.innerHTML = "Unknown User";
+    }
+
     document.getElementById('logoutButton').addEventListener('click', () => {
-  window.location.href = '/logout';
-});
+        window.location.href = '/logout';
+    });
 </script>
+
 </html>

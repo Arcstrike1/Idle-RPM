@@ -31,6 +31,13 @@ export async function getUserByUsername(username) {
   );
   return rows[0];
 }
+export async function getUserByUserId(userId) {
+  const [rows] = await promisePool.query(
+    'SELECT * FROM users WHERE id = ?',
+    [userId]
+  );
+  return rows[0];
+}
 
 export async function getSaveByUserId(userId, slot = 'auto') {
   const [rows] = await promisePool.query(
@@ -66,4 +73,5 @@ export default {
   getUserByUsername,
   getSaveByUserId,
   upsertSave,
+  getUserByUserId
 };

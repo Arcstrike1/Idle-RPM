@@ -24,6 +24,23 @@ const login = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+const getUser = async (req, res) => {
+  try {
+    const userId = req.session?.userId;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const user = await queries.getUserByUserId(userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    return res.json({
+      userName: user.username,
+      id: user.id
+    });
+  } catch (e) {
+    console.error('Get user error', e);
+    return res.status(500).json({ error: 'Server couldn’t find user' });
+  }
+};
 
 const getSave = async (req, res) => {
   try {
@@ -84,4 +101,5 @@ export default  {
   signup ,
    login,
     getSave,
-     saveGame};
+     saveGame,
+      getUser};

@@ -17,6 +17,15 @@
                 <button id="logoutButton" class="nav-button">Logout</button>
                 <button id="friendsButton" class="nav-button">Friends</button>
                 <button id="addFriendButton" class="nav-button">Add Friend</button>
+                <div id="friendClickArea">
+                    <div class="friend-form-popup" id="friendForm" style="display:none; position:fixed; z-index:9;">
+                        <form id="friendFormFields">
+                            <p style="display:block; margin-top:8px; font-size:0.9rem; ">input the users name you would like to add</p>
+                            Username:<input style="width:100%; padding:8px; margin-top:6px; border:2px solid #222; border-radius:4px; " id="username" name="username">
+                            <button id="friendRequestButton" class="nav-button">Add</button>
+                        </form>
+                    </div>
+                </div>
                 <button id="raceButton" class="nav-button">Start Race</button>
             </div>
             <h1 id="rubber-count" style="text-align: center;background-color: rgba(0, 0, 0, 0.4);color:azure;align-self: center;width:113.5%; position: relative; left:-6.75%;"></h1>
@@ -47,16 +56,65 @@
                 <h2 style="position:relative;top: -130px; color:azure;">Parts</h2>
                 <div style="position:relative;top:-125px;" id="upgrades-list"></div>
             </div>
+            <div style="max-width: 250px; align-items: center;">
+                <h1 id="userName" style="color:white;"></h1>
+                <h2 id="alertMessage"></h2>
+            </div>
         </div>
-        <h1 id="userName"></h1>
+        
     </div>
     
 </body>
 <script type="module">
-    let userInfo = null;
+    let friendForm = document.getElementById("friendForm");
+    let addFriendButton = document.getElementById("addFriendButton");
+    
+    openClose(addFriendButton,friendForm);
 
+    function openClose(button,form){
+        button.addEventListener("click",(e)=>{
+            if(form.style.display == "none"){
+                form.style.display = "block";
+            }else{
+                form.style.display = "none";
+            }
+        });
+    }
+    const friendClickArea = document.getElementById("friendClickArea");
+
+    dragWindow(friendClickArea,friendForm);
+
+    let activeDrag = null;
+    function dragWindow(handleEl, winEl) {
+        handleEl.addEventListener('mousedown', (e) => {
+        
+        // set the active drag target
+        activeDrag = {
+        win: winEl,
+        offsetX: e.clientX - winEl.offsetLeft,
+        offsetY: e.clientY - winEl.offsetTop
+        };
+
+    });
+    }
+     // one global move handler
+    document.addEventListener('mousemove', (e) => {
+    if (!activeDrag) return;
+
+    const { win, offsetX, offsetY } = activeDrag;
+    win.style.left = (e.clientX - offsetX) + 'px';
+    win.style.top  = (e.clientY - offsetY) + 'px';
+    });
+
+    // one global mouseup handler
+    document.addEventListener('mouseup', () => {
+    activeDrag = null;
+    document.body.style.userSelect = 'auto';
+    });
+
+    let userInfo = null;
     try {
-        const res = await fetch('/users/userInfo', {
+        const res = await fetch('/users/userName', {
             method: 'GET',
             credentials: 'include'
         });
@@ -80,6 +138,36 @@
 
     document.getElementById('logoutButton').addEventListener('click', () => {
         window.location.href = '/logout';
+    });
+    let alertMessage = document.getElementById("alertMessage");
+
+    document.getElementById('friendRequestButton').addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+            const friendFormFields = document.getElementById('friendFormFields');
+            const formdata = new FormData(friendFormFields);
+
+            const data = Object.fromEntries(formdata.entries());
+
+            const res = await fetch("users/addFriend",{
+                method: "POST",
+                credentials:"include",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            if(!res.ok){
+                console.error(`Failed to send request to ${data.username}`)
+                alertMessage.textContent = `Friend Request sent to ${data.username} Failed!`;
+                alertMessage.classList.add("failMessage")
+            }else{
+                alertMessage.textContent = `Friend Request sent to ${data.username}!`;
+                alertMessage.classList.add("successMessage")
+            }
+        } catch (error) {
+            console.error("Couldn't Add friend", error);
+        }
     });
 </script>
 

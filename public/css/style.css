@@ -24,6 +24,22 @@ body{
 #game-container{
     display:flex;
 }
+
+.friend-form-popup{
+    background: rgba(0,0,0,0.6);
+    padding:20px;
+    border: 6px solid rgba(128,56,42,0.9);
+    width:320px;
+    color: white;
+    border-radius:6px;
+}
+.failMessage{
+    color:red;
+
+}
+.successMessage{
+    color:green;
+}
 #score-area{
     display:block;
     margin-right:50px;

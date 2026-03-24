@@ -233,7 +233,7 @@ const game ={
     // - unlock checks
     update() {
         const el = document.getElementById('rubber-count');
-        if (el) el.innerText = "Total Rubber: "+ Math.floor(this.state.rubber);
+        if (el) el.innerText = "Total Rubber: \n"+ Math.floor(this.state.rubber);
         const el2 = document.getElementById('rps-count');
         if(el2) el2.innerText = "Rubber per second: "+Math.floor(this.calculateTotalRPS());
         const el3 = document.getElementById('rpc-count');

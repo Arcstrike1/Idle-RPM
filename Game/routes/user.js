@@ -10,5 +10,6 @@ router.post('/login', userController.login);
 router.get('/save', ensureAuth, userController.getSave);
 router.post('/save', ensureAuth, userController.saveGame);
 
-router.get('/userInfo',ensureAuth,userController.getUser);
+router.get('/userName',ensureAuth,userController.getUser);
+
 export default router;

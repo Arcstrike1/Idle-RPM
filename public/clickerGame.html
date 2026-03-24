@@ -143,30 +143,37 @@
 
     document.getElementById('friendRequestButton').addEventListener('click', async (e) => {
         e.preventDefault();
+
         try {
             const friendFormFields = document.getElementById('friendFormFields');
             const formdata = new FormData(friendFormFields);
-
             const data = Object.fromEntries(formdata.entries());
 
-            const res = await fetch("users/addFriend",{
+            const res = await fetch("users/addFriend", {
                 method: "POST",
-                credentials:"include",
+                credentials: "include",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify(data)
-            })
-            if(!res.ok){
-                console.error(`Failed to send request to ${data.username}`)
-                alertMessage.textContent = `Friend Request sent to ${data.username} Failed!`;
-                alertMessage.classList.add("failMessage")
-            }else{
-                alertMessage.textContent = `Friend Request sent to ${data.username}!`;
-                alertMessage.classList.add("successMessage")
+                body: JSON.stringify(data),
+            });
+
+            const json = await res.json();
+
+            if (!res.ok) {
+                alertMessage.textContent = json.error || `Friend Request to ${data.username} failed`;
+                alertMessage.classList.remove("successMessage");
+                alertMessage.classList.add("failMessage");
+            } else {
+                alertMessage.textContent = json.message;
+                alertMessage.classList.remove("failMessage");
+                alertMessage.classList.add("successMessage");
             }
+
         } catch (error) {
             console.error("Couldn't Add friend", error);
+            alertMessage.textContent = "Unexpected error occurred";
+            alertMessage.classList.add("failMessage");
         }
     });
 </script>

@@ -46,7 +46,18 @@ export async function getSaveByUserId(userId, slot = 'auto') {
   );
   return rows[0] ? rows[0].data : null;
 }
-
+export async function createFriendship(user1,user2){
+  await promisePool.query(
+    'INSERT INTO friendships (user_id,friend_id) VALUES (?,?)',[user1,user2]
+  );
+}
+export async function getFriendship(user1, user2) {
+  const [rows] = await promisePool.query(
+    'SELECT * FROM friendships WHERE user_id = ? AND friend_id = ?',
+    [user1, user2]
+  );
+  return rows[0];
+}
 export async function upsertSave(userId, data, slot = 'auto') {
   const [result] = await promisePool.query(
     'SELECT id FROM game_saves WHERE user_id = ? AND slot_name = ? LIMIT 1',
@@ -73,5 +84,7 @@ export default {
   getUserByUsername,
   getSaveByUserId,
   upsertSave,
-  getUserByUserId
+  getUserByUserId,
+  createFriendship,
+  getFriendship
 };

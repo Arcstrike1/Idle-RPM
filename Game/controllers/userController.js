@@ -41,7 +41,42 @@ const getUser = async (req, res) => {
     return res.status(500).json({ error: 'Server couldn’t find user' });
   }
 };
+const addFriend = async (req, res) => {
+  try {
+    const userId = req.session?.userId;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
+    const user = await queries.getUserByUserId(userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const { username } = req.body;
+    if (!username) {
+      return res.status(400).json({ error: "Username is required to friend an account" });
+    }
+
+    const friend = await queries.getUserByUsername(username);
+    if (!friend) return res.status(404).json({ error: "User not found" });
+
+    // Prevent friending yourself
+    if (friend.id === userId) {
+      return res.status(400).json({ error: "You cannot friend yourself" });
+    }
+
+    // Prevent duplicate friendships
+    const existing = await queries.getFriendship(userId, friend.id);
+    if (existing) {
+      return res.status(400).json({ error: "Already friends" });
+    }
+
+    await queries.createFriendship(userId, friend.id);
+
+    return res.json({ message: `${username} has been added successfully` });
+
+  } catch (e) {
+    console.error('Add Friend error', e);
+    return res.status(500).json({ error: 'Failed to add user' });
+  }
+};
 const getSave = async (req, res) => {
   try {
     const userId = req.session?.userId;
@@ -99,7 +134,9 @@ const signup = async (req, res) =>{
 
 export default  {
   signup ,
-   login,
-    getSave,
-     saveGame,
-      getUser};
+  login,
+  getSave,
+  saveGame,
+  getUser,
+  addFriend
+};

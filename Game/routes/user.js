@@ -11,5 +11,5 @@ router.get('/save', ensureAuth, userController.getSave);
 router.post('/save', ensureAuth, userController.saveGame);
 
 router.get('/userName',ensureAuth,userController.getUser);
-
+router.post('/addFriend',ensureAuth,userController.addFriend);
 export default router;

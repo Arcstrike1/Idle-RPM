@@ -4,7 +4,7 @@ const game ={
     // rubber per click
     // multipliers
     // timers
-    state: { rubber:0, rps:0, rpc:1, rmulti:1 },
+    state: { rubber:0, rps:0, rpc:1, rmulti:1, totalClicks: 0 },
     // array or dictionary of building objects
     // each building has:
     // - name
@@ -152,7 +152,8 @@ const game ={
             rubber: 0,
             rps: 1,
             rpc: 1,
-            rmulti: 1
+            rmulti: 1,
+            totalClicks: 0
         };
         this.render();
         this.startTickLoop();
@@ -336,6 +337,10 @@ const game ={
         console.error("Game state is not initialized.");
         return;
     }
+        // Increment rubber count
+        this.state.rubber += this.calculateTotalRPC();
+        this.state.totalClicks++;
+
         const wheel = document.getElementById("gameWheel");
 
         // Spin the wheel

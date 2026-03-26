@@ -1,11 +1,10 @@
-// Use `mysql2` which supports MySQL 8 auth plugins
-let mysql = require('mysql2');
+import mysql  from 'mysql2';
 
 let pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASS || 'cset155',
-  database: process.env.DB_NAME || 'idlerpm',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS, 
+  database: process.env.DB_NAME, 
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
@@ -20,4 +19,6 @@ pool.getConnection((err, connection) => {
   if (connection) connection.release();
 });
 
-module.exports = pool.promise();
+export const promisePool = pool.promise();
+export { pool };
+

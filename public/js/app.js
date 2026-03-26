@@ -165,6 +165,7 @@ const game ={
 
         // autosave every 30 seconds
         setInterval(() => this.save(true), 30000);
+        setInterval(()=> renderPendingRequests(),3000);
     },
     // calculate total RPS from buildings and modifiers
     calculateTotalRPS() {
@@ -503,7 +504,7 @@ function attachPendingHandlers() {
     document.querySelectorAll(".accept-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
             const id = btn.dataset.id;
-            await fetch("/users/accept", {
+            await fetch("/users/acceptFriendship", {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -516,7 +517,7 @@ function attachPendingHandlers() {
     document.querySelectorAll(".reject-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
             const id = btn.dataset.id;
-            await fetch("/users/reject", {
+            await fetch("/users/rejectFriendship", {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -559,7 +560,7 @@ async function renderPendingRequests() {
     attachPendingHandlers();
 }
 
-renderPendingRequests();
+
 
     let friendForm = document.getElementById("friendForm");
     let addFriendButton = document.getElementById("addFriendButton");

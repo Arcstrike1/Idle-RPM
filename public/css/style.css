@@ -11,8 +11,7 @@
     position: relative;
 }
 body{
-    background-image: url(/Game/images/mainBack.svg);
-    background-color: (96, 187, 255);
+    background-image: url(../Game/images/mainBack.png);
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;

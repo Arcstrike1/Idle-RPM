@@ -495,7 +495,73 @@ window.onload = async function(req,res) {
         wheel.style.transform = "scale(1)"
     });
 };
-let friendForm = document.getElementById("friendForm");
+
+//_-----------------------------------------------------------------
+        // FRONT END COMPONENT PIECES
+//--------------------------------------------------------------------
+function attachPendingHandlers() {
+    document.querySelectorAll(".accept-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const id = btn.dataset.id;
+            await fetch("/users/accept", {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ friendId: id })
+            });
+            renderPendingRequests();
+        });
+    });
+
+    document.querySelectorAll(".reject-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const id = btn.dataset.id;
+            await fetch("/users/reject", {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ friendId: id })
+            });
+            renderPendingRequests();
+        });
+    });
+}
+
+async function loadPendingRequests() {
+    const res = await fetch("/users/pendingFriendships", {
+        method: "GET",
+        credentials: "include"
+    });
+
+    const json = await res.json();
+    return json.pending || [];
+}
+
+async function renderPendingRequests() {
+    const list = await loadPendingRequests();
+    const container = document.getElementById("pendingRequests");
+
+    container.innerHTML = ""; // clear old content
+
+    list.forEach(friend => {
+        const row = document.createElement("div");
+        row.classList.add("pending-row");
+
+        row.innerHTML = `
+            <span>Friend Request From: ${friend.name}</span>
+            <button class="accept-btn" data-id="${friend.id}">Accept</button>
+            <button class="reject-btn" data-id="${friend.id}">Reject</button>
+        `;
+
+        container.appendChild(row);
+    });
+
+    attachPendingHandlers();
+}
+
+renderPendingRequests();
+
+    let friendForm = document.getElementById("friendForm");
     let addFriendButton = document.getElementById("addFriendButton");
     
     openClose(addFriendButton,friendForm);

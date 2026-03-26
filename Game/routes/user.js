@@ -5,7 +5,7 @@ import ensureAuth from "../middleware/ensureAuth.js";
 
 router.post('/signup', userController.signup);
 router.post('/login', userController.login);
-
+router.get("/pendingFriendships",ensureAuth,userController.pendingRequests);
 
 router.get('/save', ensureAuth, userController.getSave);
 router.post('/save', ensureAuth, userController.saveGame);

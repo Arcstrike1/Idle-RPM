@@ -51,6 +51,14 @@ export async function createFriendship(user1,user2){
     'INSERT INTO friendships (user_id,friend_id) VALUES (?,?)',[user1,user2]
   );
 }
+export async function getPendingFriendships(userId){
+  const [rows] = await promisePool.query(
+    'SELECT * FROM friendships WHERE friend_id = ? AND status = "pending"',
+    [userId]
+  );
+  return rows; 
+}
+
 export async function getFriendship(user1, user2) {
   const [rows] = await promisePool.query(
     'SELECT * FROM friendships WHERE user_id = ? AND friend_id = ?',
@@ -86,5 +94,6 @@ export default {
   upsertSave,
   getUserByUserId,
   createFriendship,
-  getFriendship
+  getFriendship,
+  getPendingFriendships
 };

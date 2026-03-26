@@ -12,6 +12,12 @@
 </head>
 <body>
     <div id="game-container">
+        <div id="pendingRequestsContainer" style="display: flex; flex-direction: column; margin-right: 25px;">
+            <h1 style="color:white;">Pending Requests</h1>
+             <div id="pendingRequests">
+                
+             </div>
+        </div>
         <div id="score-area">
             <div id="nav" style="display: inline;">
                 <button id="logoutButton" class="nav-button">Logout</button>
@@ -60,12 +66,10 @@
                 <h1 id="userName" style="color:white;"></h1>
                 <h2 id="alertMessage"></h2>
             </div>
+            
         </div>
         
     </div>
     
 </body>
-<script type="module" src="./js/app.js">
-</script>
-
 </html>

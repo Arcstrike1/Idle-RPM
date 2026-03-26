@@ -42,7 +42,7 @@ body{
 }
 #score-area{
     display:block;
-    margin-right:50px;
+    margin-right:25px;
     border: 10px rgb(128, 56, 42) ridge;
     padding:15px;
     height:90vh;
@@ -124,6 +124,63 @@ body{
     top:50px;
     animation: disperse 2s ease-out forwards;
     pointer-events: none;
+}
+#pendingRequestsContainer{
+    background-image: url(/Game/images/garback.jpg);
+    display: flex;
+    border: 10px rgb(128, 56, 42) ridge;
+}
+/* Container for each pending request */
+.pending-row {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0,0,0,0.55);
+    border: 4px ridge rgb(128, 56, 42);
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    color: white;
+    font-size: 1rem;
+    max-width:150px;
+}
+
+/* Name text */
+.pending-row span {
+    flex: 1;
+    font-weight: 600;
+    
+}
+
+/* Accept / Reject buttons styled like nav-button */
+.accept-btn,
+.reject-btn {
+    border-style: outset;
+    border-width: 4px;
+    background-image: url(/Game/images/buttonbackground.png);
+    padding: 4px 10px;
+    margin-left: 6px;
+    cursor: pointer;
+    color: white;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    transition: .3s ease all;
+}
+
+/* Hover effect matches your nav-button hover */
+.accept-btn:hover,
+.reject-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Optional: color tint for clarity */
+.accept-btn {
+    box-shadow: inset 0 0 6px rgba(0,255,0,0.4);
+}
+
+.reject-btn {
+    box-shadow: inset 0 0 6px rgba(255,0,0,0.4);
 }
 
 @keyframes disperse {

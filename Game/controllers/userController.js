@@ -131,7 +131,37 @@ const signup = async (req, res) =>{
         console.error('Signup error:', error);
         res.status(500).json({ error: 'Server error during signup' });
     }
-}
+};
+const pendingRequests = async (req, res) => {
+  try {
+    const userId = req.session?.userId;
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const pending = await queries.getPendingFriendships(userId);
+
+    const friends = [];
+
+    for (const request of pending) {
+      const friend = await queries.getUserByUserId(request.user_id);
+      if (friend) {
+        friends.push({
+          id: friend.id,
+          name: friend.username
+        });
+      }
+    }
+
+    return res.json({ pending: friends });
+
+  } catch (e) {
+    console.error('Pending requests error', e);
+    return res.status(500).json({ error: 'Server couldn’t fetch pending requests' });
+  }
+};
+
+
 
 export default  {
   signup ,
@@ -139,5 +169,6 @@ export default  {
   getSave,
   saveGame,
   getUser,
-  addFriend
+  addFriend,
+  pendingRequests
 };

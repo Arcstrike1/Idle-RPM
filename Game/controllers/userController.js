@@ -15,9 +15,9 @@ const login = async (req, res) => {
 
     const match = await bcrypt.compare(password, user.password_hash);
     if (!match) return res.status(401).json({ error: 'Invalid credentials' });
-
     
     req.session.userId = user.id;
+    
     res.json({ message: 'Logged in' });
   } catch (err) {
     console.error(err);
@@ -82,6 +82,7 @@ const getSave = async (req, res) => {
     const userId = req.session?.userId;
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
     const data = await queries.getSaveByUserId(userId);
+    req.session.data = data;
     return res.json({ save: data });
   } catch (err) {
     console.error('Get save error', err);

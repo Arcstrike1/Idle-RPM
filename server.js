@@ -21,7 +21,7 @@ import session from "express-session";
 import expressMySQLSession from 'express-mysql-session';
 const MySQLStore = expressMySQLSession(session);
 
-const sessionStore = new MySQLStore({},promisePool);
+export const sessionStore = new MySQLStore({},promisePool);
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
@@ -42,7 +42,39 @@ app.get('/', (req, res) => {
 app.get('/signup',(req,res)=> {
     res.sendFile(path.join(__dirname,'public','signup.html'));
 })
+app.post("/session/save", (req, res) => {
+  if (!req.session) {
+    return res.status(500).json({ error: "Session not initialized" });
+  }
+
+  req.session.data = req.body.save;
+  
+  res.json({ ok: true,data:req.session.data });
+});
+app.get("/session/save",(req,res)=> {
+  if(!req.session){
+    return res.status(500).json({error: "Session not initialized"});
+  }
+
+  res.json({ ok: true,data:req.session.data });
+})
+
+
 app.get('/logout', (req, res) => {
+  console.log("logout pressed");
+  const data = req.session.data;
+
+  console.log(data);
+
+  console.log("Saving to server");
+
+  fetch(`http://localhost:${PORT}/users/save`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ save: data })
+  }).catch(err=>console.warn('server save failed', err));
+
   req.session.destroy((err) => {
     if (err) {
       console.error('Session destruction error:', err);

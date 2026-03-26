@@ -311,61 +311,83 @@ const game ={
     // serialize game state
     // save to localStorage
     // load from localStorage
-    save(saveToServer=true) {
-        // serialize minimal state
+    async save() {
         const data = {
             state: this.state,
             buildings: this.buildings.map(b => ({ count: b.count })),
             upgrades: this.upgrades.map(u => ({ purchased: u.purchased })),
             buffs: this.buffs
         };
-        // localStorage copy
-        try {
-            localStorage.setItem('idleRPM_save', JSON.stringify(data));
-        } catch (e) {
-            console.warn('localStorage save failed', e);
-        }
-        // optionally send to server if logged in
-        if (saveToServer) {
-            console.log("Saving to server")
-            fetch('/users/save', {
-                method: 'POST',
-                headers: { 'Content-Type':'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ save: data })
-            }).catch(err=>console.warn('server save failed', err));
-        }
+
+        const res = await fetch("/session/save", {
+            method: "POST",
+            headers: { 'Content-Type':'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ save: data })
+        });
+
+        const json = await res.json();
+        console.log("Session save:", json);
     },
-    async load() {
-        
-        try {
-            const res = await fetch("/users/save", {
-            method: "GET",
-            credentials: "include"
-            });
 
-            const s = await res.json();
+    async load(req, res) {
+            try {
+                const res = await fetch("/session/save", {
+                method: "GET",
+                credentials: "include"
+                });
+                const s = await res.json();
 
-            if (s) {
-                const obj = s.save;
-                if (obj.state) this.state = obj.state;
-                if (Array.isArray(obj.buildings)){
-                    for (let i=0;i<this.buildings.length;i++){
-                        if (obj.buildings[i] && typeof obj.buildings[i].count==='number'){
-                            this.buildings[i].count = obj.buildings[i].count;
+                if (s) {
+                    const obj = s;
+                    if (obj.state) this.state = obj.state;
+                    if (Array.isArray(obj.buildings)){
+                        for (let i=0;i<this.buildings.length;i++){
+                            if (obj.buildings[i] && typeof obj.buildings[i].count==='number'){
+                                this.buildings[i].count = obj.buildings[i].count;
+                            }
                         }
                     }
-                }
-                if (Array.isArray(obj.upgrades)){
-                    for (let i=0;i<this.upgrades.length && i<obj.upgrades.length;i++){
-                        if (obj.upgrades[i] && typeof obj.upgrades[i].purchased==='boolean'){
-                            this.upgrades[i].purchased = obj.upgrades[i].purchased;
+                    if (Array.isArray(obj.upgrades)){
+                        for (let i=0;i<this.upgrades.length && i<obj.upgrades.length;i++){
+                            if (obj.upgrades[i] && typeof obj.upgrades[i].purchased==='boolean'){
+                                this.upgrades[i].purchased = obj.upgrades[i].purchased;
+                            }
                         }
                     }
+                    if (Array.isArray(obj.buffs)) this.buffs = obj.buffs;
                 }
-                if (Array.isArray(obj.buffs)) this.buffs = obj.buffs;
-            }
-        } catch(e){console.warn('database storage load failed',e);}
+                
+            
+            } catch(e){
+                console.error("No session",e);
+                const res = await fetch("/users/save", {
+                method: "GET",
+                credentials: "include"
+                });
+
+                const s = await res.json();
+
+                if (s) {
+                    const obj = s.save;
+                    if (obj.state) this.state = obj.state;
+                    if (Array.isArray(obj.buildings)){
+                        for (let i=0;i<this.buildings.length;i++){
+                            if (obj.buildings[i] && typeof obj.buildings[i].count==='number'){
+                                this.buildings[i].count = obj.buildings[i].count;
+                            }
+                        }
+                    }
+                    if (Array.isArray(obj.upgrades)){
+                        for (let i=0;i<this.upgrades.length && i<obj.upgrades.length;i++){
+                            if (obj.upgrades[i] && typeof obj.upgrades[i].purchased==='boolean'){
+                                this.upgrades[i].purchased = obj.upgrades[i].purchased;
+                            }
+                        }
+                    }
+                    if (Array.isArray(obj.buffs)) this.buffs = obj.buffs;
+                }}
+            
     },
     // formatting numbers
     // random helpers
@@ -426,13 +448,15 @@ const game ={
         this.state.rubber += this.calculateTotalRPC();
     }
 };
-window.onload = async function() {
+window.onload = async function(req,res) {
     game.init();
     // try to fetch server-side save for logged-in user
     try {
         const res = await fetch('/users/save');
         if (res.ok) {
             const data = await res.json();
+            
+            console.log(data);
             if (data.save) {
                 const s = data.save;
                 // merge state
@@ -457,6 +481,7 @@ window.onload = async function() {
                 if (Array.isArray(s.buffs)) game.buffs = s.buffs;
             }
         }
+        game.render();
     } catch (err) {
         console.warn('Could not load server save:', err);
     }
@@ -470,3 +495,113 @@ window.onload = async function() {
         wheel.style.transform = "scale(1)"
     });
 };
+let friendForm = document.getElementById("friendForm");
+    let addFriendButton = document.getElementById("addFriendButton");
+    
+    openClose(addFriendButton,friendForm);
+
+    function openClose(button,form){
+        button.addEventListener("click",(e)=>{
+            if(form.style.display == "none"){
+                form.style.display = "block";
+            }else{
+                form.style.display = "none";
+            }
+        });
+    }
+    const friendClickArea = document.getElementById("friendClickArea");
+
+    dragWindow(friendClickArea,friendForm);
+
+    let activeDrag = null;
+    function dragWindow(handleEl, winEl) {
+        handleEl.addEventListener('mousedown', (e) => {
+        
+        // set the active drag target
+        activeDrag = {
+        win: winEl,
+        offsetX: e.clientX - winEl.offsetLeft,
+        offsetY: e.clientY - winEl.offsetTop
+        };
+
+    });
+    }
+     // one global move handler
+    document.addEventListener('mousemove', (e) => {
+    if (!activeDrag) return;
+
+    const { win, offsetX, offsetY } = activeDrag;
+    win.style.left = (e.clientX - offsetX) + 'px';
+    win.style.top  = (e.clientY - offsetY) + 'px';
+    });
+
+    // one global mouseup handler
+    document.addEventListener('mouseup', () => {
+    activeDrag = null;
+    document.body.style.userSelect = 'auto';
+    });
+
+    let userInfo = null;
+    try {
+        const res = await fetch('/users/userName', {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (!res.ok) {
+            console.error("User not logged in");
+        } else {
+            userInfo = await res.json();
+        }
+    } catch (e) {
+        console.error("Couldn't get user info", e);
+    }
+
+    const userName = document.getElementById("userName");
+
+    if (userInfo && userInfo.userName) {
+        userName.innerHTML = `${userInfo.userName}'s Garage`;
+    } else {
+        userName.innerHTML = "Unknown User";
+    }
+
+    document.getElementById('logoutButton').addEventListener('click', () => {
+        window.location.href = '/logout';
+    });
+    let alertMessage = document.getElementById("alertMessage");
+
+    document.getElementById('friendRequestButton').addEventListener('click', async (e) => {
+        e.preventDefault();
+        console.log("add friend clicked");
+        try {
+            const friendFormFields = document.getElementById('friendFormFields');
+            const formdata = new FormData(friendFormFields);
+            const data = Object.fromEntries(formdata.entries());
+
+            const res = await fetch("users/addFriend", {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            const json = await res.json();
+
+            if (!res.ok) {
+                alertMessage.textContent = json.error || `Friend Request to ${data.username} failed`;
+                alertMessage.classList.remove("successMessage");
+                alertMessage.classList.add("failMessage");
+            } else {
+                alertMessage.textContent = json.message;
+                alertMessage.classList.remove("failMessage");
+                alertMessage.classList.add("successMessage");
+            }
+
+        } catch (error) {
+            console.error("Couldn't Add friend", error);
+            alertMessage.textContent = "Unexpected error occurred";
+            alertMessage.classList.add("failMessage");
+        }
+    });

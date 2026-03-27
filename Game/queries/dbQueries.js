@@ -46,10 +46,33 @@ export async function getSaveByUserId(userId, slot = 'auto') {
   );
   return rows[0] ? rows[0].data : null;
 }
-export async function createFriendship(user1,user2){
+export async function createFriendship(requesterId,currentUserId){
   await promisePool.query(
-    'INSERT INTO friendships (user_id,friend_id) VALUES (?,?)',[user1,user2]
+    'INSERT INTO friendships (user_id,friend_id) VALUES (?,?)',[requesterId,currentUserId]
   );
+}
+export async function acceptFriendship(requesterId, currentUserId) {
+  await promisePool.query(
+    'UPDATE friendships SET status = "accepted" WHERE user_id = ? AND friend_id = ?',
+    [requesterId, currentUserId]
+  );
+}
+
+export async function rejectFriendship(requesterId, currentUserId) {
+  await promisePool.query(
+    'UPDATE friendships SET status = "rejected" WHERE user_id = ? AND friend_id = ?',
+    [requesterId, currentUserId]
+  );
+}
+
+export async function getAcceptedFriendships(userId) {
+  const [rows] = await promisePool.query(
+    `SELECT * FROM friendships 
+     WHERE (user_id = ? OR friend_id = ?) 
+     AND status = "accepted"`,
+    [userId, userId]
+  );
+  return rows;
 }
 export async function getPendingFriendships(userId){
   const [rows] = await promisePool.query(
@@ -95,5 +118,8 @@ export default {
   getUserByUserId,
   createFriendship,
   getFriendship,
-  getPendingFriendships
+  getPendingFriendships,
+  getAcceptedFriendships,
+  acceptFriendship,
+  rejectFriendship
 };

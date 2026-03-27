@@ -1,7 +1,7 @@
 
 import bcrypt from 'bcryptjs';
 
-import queries from "../queries/dbQueries.js";
+import queries, { rejectFriendship } from "../queries/dbQueries.js";
 
 
 const login = async (req, res) => {
@@ -132,6 +132,61 @@ const signup = async (req, res) =>{
         res.status(500).json({ error: 'Server error during signup' });
     }
 };
+const acceptFriendRequest = async (req, res) => {
+  try{
+    const userId = req.session?.userId;
+    if(!userId){
+      return res.status(401).json({error: 'Unauthorized'});
+    }
+    let friendId = req.body.friendId;
+    queries.acceptFriendship(friendId,userId);
+  }catch(e){
+    console.error('Request Accept error', e);
+    return res.status(500).json({ error: 'Server couldn’t accept request' });
+  }
+}
+const rejectFriendRequest = async (req, res) => {
+  try{
+    const userId = req.session?.userId;
+    if(!userId){
+      return res.status(401).json({error: 'Unauthorized'});
+    }
+    let friendId = req.body.friendId;
+    queries.rejectFriendship(friendId,userId);
+  }catch(e){
+    console.error('Reject Request error', e);
+    return res.status(500).json({ error: 'Server couldn’t Reject Request' });
+  }
+}
+const acceptedRequests = async (req, res) => {
+  try {
+    const userId = req.session?.userId;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const acceptedRows = await queries.getAcceptedFriendships(userId);
+    const friends = [];
+
+    for (const row of acceptedRows) {
+      
+      const friendIdToLookUp = (row.user_id == userId) ? row.friend_id : row.user_id;
+      
+      const friend = await queries.getUserByUserId(friendIdToLookUp);
+      if (friend) {
+        friends.push({
+          id: friend.id,
+          name: friend.username
+        });
+      }
+    }
+    
+    
+    return res.json({accepted: friends}); 
+
+  } catch (e) {
+    console.error('Accepted requests error', e);
+    return res.status(500).json({ error: 'Server error' });
+  }
+};
 const pendingRequests = async (req, res) => {
   try {
     const userId = req.session?.userId;
@@ -170,5 +225,8 @@ export default  {
   saveGame,
   getUser,
   addFriend,
-  pendingRequests
+  pendingRequests,
+  acceptedRequests,
+  acceptFriendRequest,
+  rejectFriendRequest
 };

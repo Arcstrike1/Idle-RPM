@@ -165,7 +165,8 @@ const game ={
 
         // autosave every 30 seconds
         setInterval(() => this.save(true), 30000);
-        setInterval(()=> renderPendingRequests(),3000);
+        setInterval(()=> renderPendingRequests(),30000);
+        setInterval(()=> renderAcceptedRequests(),30000);
     },
     // calculate total RPS from buildings and modifiers
     calculateTotalRPS() {
@@ -288,6 +289,8 @@ const game ={
             upgradesList.appendChild(button);
         }
     }
+    renderAcceptedRequests();
+    renderPendingRequests();
 },
     // calculate building cost
     // calculate building production
@@ -500,27 +503,28 @@ window.onload = async function(req,res) {
 //_-----------------------------------------------------------------
         // FRONT END COMPONENT PIECES
 //--------------------------------------------------------------------
+// --- Handler Attachment ---
 function attachPendingHandlers() {
-    document.querySelectorAll(".accept-btn").forEach(btn => {
-        btn.addEventListener("click", async () => {
+    document.querySelectorAll('.accept-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
             const id = btn.dataset.id;
-            await fetch("/users/acceptFriendship", {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
+            await fetch('/users/acceptFriendship', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ friendId: id })
             });
             renderPendingRequests();
         });
     });
 
-    document.querySelectorAll(".reject-btn").forEach(btn => {
-        btn.addEventListener("click", async () => {
+    document.querySelectorAll('.reject-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
             const id = btn.dataset.id;
-            await fetch("/users/rejectFriendship", {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
+            await fetch('/users/rejectFriendship', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ friendId: id })
             });
             renderPendingRequests();
@@ -528,39 +532,87 @@ function attachPendingHandlers() {
     });
 }
 
-async function loadPendingRequests() {
-    const res = await fetch("/users/pendingFriendships", {
-        method: "GET",
-        credentials: "include"
+function attachMessageHandlers() {
+    
+    document.querySelectorAll('.message-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+            
+            await fetch(`/users/messages?friendId=${id}`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            
+            renderAcceptedRequests();
+        });
     });
+}
 
+// --- Data Loading ---
+async function loadActiveFriendships() {
+    const res = await fetch('/users/acceptedFriendships', {
+        method: 'GET',
+        credentials: 'include'
+    });
+    const json = await res.json();
+    return json.accepted || []; 
+}
+
+async function loadPendingRequests() {
+    const res = await fetch('/users/pendingFriendships', {
+        method: 'GET',
+        credentials: 'include'
+    });
     const json = await res.json();
     return json.pending || [];
 }
 
+// --- Rendering ---
+async function renderAcceptedRequests() {
+    const list = await loadActiveFriendships();
+    const container = document.getElementById('acceptedRequests');
+    if (!container) return;
+    console.log(list);
+    container.innerHTML = '';
+    list.forEach(friend => {
+        const row = document.createElement('div');
+        row.classList.add('accepted-row');
+        row.innerHTML = `
+            <span>${friend.name}</span>
+            <button class="message-btn" data-id="${friend.id}">Message</button>
+        `;
+        container.appendChild(row);
+    });
+    attachMessageHandlers();
+}
+
 async function renderPendingRequests() {
     const list = await loadPendingRequests();
-    const container = document.getElementById("pendingRequests");
+    const container = document.getElementById('pendingRequests');
+    if (!container) return;
 
-    container.innerHTML = ""; // clear old content
-
+    container.innerHTML = '';
     list.forEach(friend => {
-        const row = document.createElement("div");
-        row.classList.add("pending-row");
-
+        const row = document.createElement('div');
+        row.classList.add('pending-row');
         row.innerHTML = `
-            <span>Friend Request From: ${friend.name}</span>
+            <span>${friend.name}</span>
             <button class="accept-btn" data-id="${friend.id}">Accept</button>
             <button class="reject-btn" data-id="${friend.id}">Reject</button>
         `;
-
         container.appendChild(row);
     });
-
     attachPendingHandlers();
 }
 
 
+
+    let friendList = document.getElementById("friendList");
+    let friendsButton = document.getElementById("friendsButton");
+    friendsButton.addEventListener("click",(e)=>{
+        renderAcceptedRequests();
+    })
+    openClose(friendsButton,friendList);
 
     let friendForm = document.getElementById("friendForm");
     let addFriendButton = document.getElementById("addFriendButton");
@@ -569,7 +621,8 @@ async function renderPendingRequests() {
 
     function openClose(button,form){
         button.addEventListener("click",(e)=>{
-            if(form.style.display == "none"){
+            console.log("Button clicked");
+            if(form.style.display === "none"|| form.style.display === ""){
                 form.style.display = "block";
             }else{
                 form.style.display = "none";
@@ -577,7 +630,8 @@ async function renderPendingRequests() {
         });
     }
     const friendClickArea = document.getElementById("friendClickArea");
-
+    const friendListClickArea = document.getElementById("friendListClickArea");
+    dragWindow(friendListClickArea,friendList);
     dragWindow(friendClickArea,friendForm);
 
     let activeDrag = null;

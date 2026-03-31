@@ -21,7 +21,17 @@ import session from "express-session";
 import expressMySQLSession from 'express-mysql-session';
 const MySQLStore = expressMySQLSession(session);
 
-const sessionStore = new MySQLStore({},promisePool);
+const sessionStore = new MySQLStore({
+  createDatabaseTable: true,
+  schema: {
+    tableName: 'sessions',
+    columnNames: {
+      session_id: 'session_id',
+      expires: 'expires',
+      data: 'data'
+    }
+  }
+}, promisePool);
 
 app.use(session({
   secret: process.env.SESSION_SECRET,

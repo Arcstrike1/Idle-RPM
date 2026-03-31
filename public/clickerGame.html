@@ -28,6 +28,51 @@
                 </div>
                 <button id="raceButton" class="nav-button">Start Race</button>
             </div>
+            <div id="raceModal" class="modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.65); z-index:100; justify-content:center; align-items:center;">
+                <div style="background:#111; color:#fff; border: 2px solid #555; border-radius:8px; padding:20px; width:280px; text-align:center;">
+                    <h3 style="margin-top:0;">Start Race</h3>
+                    <p>Choose mode:</p>
+                    <button id="raceFriendBtn" class="nav-button" style="margin:5px;">Friend</button>
+                    <button id="raceAIbtn" class="nav-button" style="margin:5px;">AI</button>
+                    <button id="raceOnlineBtn" class="nav-button" style="margin:5px;">Online</button>
+                    <div style="margin-top:10px;"><button id="raceCancelBtn" class="nav-button" style="background:#444;border:1px solid #666;">Cancel</button></div>
+                </div>
+            </div>
+            <div id="raceDifficultyModal" class="modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.65); z-index:101; justify-content:center; align-items:center;">
+                <div style="background:#111; color:#fff; border: 2px solid #555; border-radius:8px; padding:20px; width:300px; text-align:center;">
+                    <h3 style="margin-top:0;">Choose Difficulty</h3>
+                    <button class="race-difficulty-btn" data-level="easy" style="margin:5px; width:100%;">Easy - 50 Rubber</button>
+                    <button class="race-difficulty-btn" data-level="novice" style="margin:5px; width:100%;">Novice - 100 Rubber</button>                    <button class="race-difficulty-btn" data-level="experienced" style="margin:5px; width:100%">Experienced - 150 Rubber</button>                    <button class="race-difficulty-btn" data-level="pro" style="margin:5px; width:100%;">Pro Racer - 200 Rubber</button>
+                    <button class="race-difficulty-btn" data-level="veteran" style="margin:5px; width:100%;">Veteran - 10000 Rubber</button>
+                    <div style="margin-top:10px;"><button id="raceDiffyCancelBtn" class="nav-button" style="background:#444;border:1px solid #666; width:100%;">Cancel</button></div>
+                </div>
+            </div>
+            <div id="raceArena" style="z-index: 9; display:none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.65); justify-content:center; align-items:center;">
+                <div style="background:#111; color:#fff; border: 2px solid #555; border-radius:8px; padding:20px; width:400px;">
+                    <h3 style="margin-top:0; text-align:center;">🏁 RACE</h3>
+                    <div style="margin-bottom: 16px;">
+                        <p style="color:#00ff00; margin:2px 0; font-size:11px; font-weight:bold;">YOU 🟢</p>
+                        <div style="position:relative; height:40px; background: #333; border: 1px solid #555; border-radius: 3px; overflow:hidden;">
+                            <div id="playerCar" style="position:absolute; left:0; top:8px; width:32px; height:24px; background: linear-gradient(135deg, #22ff22 0%, #00dd00 100%); border: 2px solid #003300; border-radius: 4px; box-shadow: 0 0 8px rgba(34, 255, 34, 0.6); transition: none;"></div>
+                            <div id="playerProgressTrack" style="position:absolute; bottom:4px; left:35px; right:8px; height:4px; background: #222; border-radius:2px;">
+                                <div id="playerProgress" style="height:100%; background: linear-gradient(90deg, #00ff00, #ffff00); border-radius:2px; transition:width 0.1s linear; box-shadow: 0 0 8px #00ff00;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <p style="color:#ff3333; margin:2px 0; font-size:11px; font-weight:bold;">AI 🔴</p>
+                        <div style="position:relative; height:40px; background: #333; border: 1px solid #555; border-radius: 3px; overflow:hidden;">
+                            <div id="aiCar" style="position:absolute; left:0; top:8px; width:32px; height:24px; background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%); border: 2px solid #330000; border-radius: 4px; box-shadow: 0 0 8px rgba(255, 51, 51, 0.6); transition: none;"></div>
+                            <div id="aiProgressTrack" style="position:absolute; bottom:4px; left:35px; right:8px; height:4px; background: #222; border-radius:2px;">
+                                <div id="aiProgress" style="height:100%; background: linear-gradient(90deg, #ff3333, #ffff00); border-radius:2px; transition:width 0.1s linear; box-shadow: 0 0 8px #ff3333;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="color:#00ff00; margin:8px 0; text-align:center; font-size: 12px;" id="raceStatus">Tap fast!</p>
+                    <button id="raceTapButton" class="nav-button" style="width:100%; margin-bottom:6px; padding:10px; font-size:14px; background: #00cc00; color: #000; font-weight: bold; border: 2px solid #009900;">ACCELERATE</button>
+                    <button id="raceEndButton" class="nav-button" style="width:100%; padding:8px; font-size:12px; background:#444;border:1px solid #666;">Quit</button>
+                </div>
+            </div>
             <h1 id="rubber-count" style="text-align: center;background-color: rgba(0, 0, 0, 0.4);color:azure;align-self: center;width:113.5%; position: relative; left:-6.75%;"></h1>
             <h3 id="rps-count" style="text-align: center; background-color: rgba(0, 0, 0, 0.4);color:azure; "></h3>
             <h3 id="rpc-count" style="text-align: center; background-color: rgba(0, 0, 0, 0.4);color:azure; "></h3>
@@ -54,7 +99,7 @@
             <!-- Parts Section -->
             <div id="parts-section">
                 <h2 style="position:relative;top: -130px; color:azure;">Parts</h2>
-                <div style="position:relative;top:-125px;" id="upgrades-list"></div>
+                <div style="position:relative;top:-125px;" id="parts-list"></div>
             </div>
             <div style="max-width: 250px; align-items: center;">
                 <h1 id="userName" style="color:white;"></h1>
@@ -140,6 +185,186 @@
         window.location.href = '/logout';
     });
     let alertMessage = document.getElementById("alertMessage");
+
+    const raceModal = document.getElementById('raceModal');
+    const raceDifficultyModal = document.getElementById('raceDifficultyModal');
+    const raceArena = document.getElementById('raceArena');
+    const playerCar = document.getElementById('playerCar');
+    const aiCar = document.getElementById('aiCar');
+    const playerProgressBar = document.getElementById('playerProgress');
+    const aiProgressBar = document.getElementById('aiProgress');
+    const raceStatus = document.getElementById('raceStatus');
+    const raceTapButton = document.getElementById('raceTapButton');
+    const raceEndButton = document.getElementById('raceEndButton');
+
+    const raceFn = (open) => raceModal.style.display = open ? 'flex' : 'none';
+    const difficultyFn = (open) => raceDifficultyModal.style.display = open ? 'flex' : 'none';
+    const arenaFn = (open) => raceArena.style.display = open ? 'flex' : 'none';
+
+    const difficultyLevels = {
+        easy: { aiSpeed: 80, reward: 50, name: 'Easy' },
+        novice: { aiSpeed: 90, reward: 100, name: 'Novice' },
+        experienced: {aiSpeed: 110, reward: 150, name: "Experienced"},
+        pro: { aiSpeed: 130, reward: 200, name: 'Pro-Driver' },
+        veteran: { aiSpeed: 180, reward: 1000, name: 'Veteran' }
+    };
+
+    const raceState = {
+        active: false,
+        player: 0,
+        ai: 0,
+        goal: 1000,
+        playerSpeed: 0,
+        aiSpeed: 0,
+        interval: null,
+        difficulty: 'easy'
+    };
+
+    function updateRaceBars() {
+        const playerPct = Math.min(100, (raceState.player / raceState.goal) * 100);
+        const aiPct = Math.min(100, (raceState.ai / raceState.goal) * 100);
+        playerProgressBar.style.width = `${playerPct}%`;
+        aiProgressBar.style.width = `${aiPct}%`;
+
+        const trackWidth = Math.max(0, playerCar.parentElement.clientWidth - playerCar.offsetWidth - 8);
+        const playerLeft = (playerPct / 100) * trackWidth;
+        const aiLeft = (aiPct / 100) * trackWidth;
+        playerCar.style.left = `${playerLeft}px`;
+        aiCar.style.left = `${aiLeft}px`;
+    }
+
+    function endRace(result) {
+        raceState.active = false;
+        clearInterval(raceState.interval);
+        raceState.interval = null;
+
+        // Snap to finish line so there is no lag waiting for the bar to move
+        raceState.player = Math.min(raceState.player, raceState.goal);
+        raceState.ai = Math.min(raceState.ai, raceState.goal);
+        updateRaceBars();
+
+        if (result.includes('Win')) {
+            const reward = difficultyLevels[raceState.difficulty].reward;
+            if (window.game && window.game.state) {
+                window.game.state.rubber += reward;
+                if (typeof window.game.update === 'function') window.game.update();
+            }
+            raceStatus.textContent = `${result} You earned ${reward} rubber!`;
+        } else {
+            raceStatus.textContent = result;
+        }
+
+        // keep the results visible immediately (no forced wait)
+        raceTapButton.disabled = true;
+        raceEndButton.textContent = 'Close Race';
+    }
+
+    function tickRace() {
+        if (!raceState.active) return;
+
+        const dt = 100 / 1000;
+        raceState.ai += raceState.aiSpeed * dt;
+        raceState.player += raceState.playerSpeed * dt;
+        raceState.playerSpeed = Math.max(0, raceState.playerSpeed - 0.25);
+
+        // clamp to goal for instant end display
+        if (raceState.player >= raceState.goal) raceState.player = raceState.goal;
+        if (raceState.ai >= raceState.goal) raceState.ai = raceState.goal;
+
+        updateRaceBars();
+
+        if (raceState.player >= raceState.goal || raceState.ai >= raceState.goal) {
+            raceState.active = false;
+            clearInterval(raceState.interval);
+            raceState.interval = null;
+
+            if (raceState.player >= raceState.goal && raceState.player >= raceState.ai) {
+                endRace('🏆 Win! You beat AI!');
+            } else {
+                endRace('💥 Lose. AI crossed first.');
+            }
+            return;
+        }
+
+        raceStatus.textContent = `${Math.floor(raceState.player)} / ${Math.floor(raceState.ai)}`;
+    }
+
+    function startAiRace(difficulty) {
+        raceFn(false);
+        difficultyFn(false);
+        arenaFn(true);
+
+        raceState.active = true;
+        raceState.player = 0;
+        raceState.ai = 0;
+        raceState.playerSpeed = 0;
+        raceState.difficulty = difficulty;
+        const level = difficultyLevels[difficulty];
+        raceState.aiSpeed = level.aiSpeed + (Math.random() * 1.5);
+        raceState.goal = 1000;
+
+        playerCar.style.left = '0px';
+        aiCar.style.left = '0px';
+        updateRaceBars();
+        raceStatus.textContent = `${level.name} Race! Tap fast!`;
+
+        raceTapButton.disabled = false;
+        raceEndButton.textContent = 'Quit Race';
+
+        if (raceState.interval) clearInterval(raceState.interval);
+        raceState.interval = setInterval(tickRace, 100);
+    }
+
+    function startFriendRace() {
+        raceFn(false);
+        alert('Friend mode coming soon!');
+    }
+
+    function startOnlineRace() {
+        raceFn(false);
+        alert('Online mode coming soon!');
+    }
+
+    document.getElementById('raceButton').addEventListener('click', () => {
+        raceFn(true);
+    });
+    document.getElementById('raceCancelBtn').addEventListener('click', () => {
+        raceFn(false);
+    });
+    document.getElementById('raceDiffyCancelBtn').addEventListener('click', () => {
+        difficultyFn(false);
+    });
+
+    document.getElementById('raceFriendBtn').addEventListener('click', startFriendRace);
+    document.getElementById('raceOnlineBtn').addEventListener('click', startOnlineRace);
+    
+    document.getElementById('raceAIbtn').addEventListener('click', () => {
+        raceFn(false);
+        difficultyFn(true);
+    });
+
+    document.querySelectorAll('.race-difficulty-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const level = e.target.getAttribute('data-level');
+            startAiRace(level);
+        });
+    });
+
+    raceTapButton.addEventListener('click', () => {
+        if (!raceState.active) return;
+        raceState.playerSpeed += 5;
+        raceState.player += 12;
+        raceState.playerSpeed = Math.min(raceState.playerSpeed, 80);
+    });
+
+    raceEndButton.addEventListener('click', () => {
+        if (raceState.interval) clearInterval(raceState.interval);
+        raceState.active = false;
+        arenaFn(false);
+        raceStatus.textContent = 'Race aborted.';
+        raceTapButton.disabled = false;
+        raceEndButton.textContent = 'Quit Race';
+    });
 
     document.getElementById('friendRequestButton').addEventListener('click', async (e) => {
         e.preventDefault();

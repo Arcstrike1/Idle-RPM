@@ -470,3 +470,6 @@ window.onload = async function() {
         wheel.style.transform = "scale(1)"
     });
 };
+
+// Expose global game object for external modules (e.g., race overlay logic)
+window.game = game;

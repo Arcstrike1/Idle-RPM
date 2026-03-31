@@ -51,19 +51,20 @@ export async function createFriendship(requesterId,currentUserId){
     'INSERT INTO friendships (user_id,friend_id) VALUES (?,?)',[requesterId,currentUserId]
   );
 }
-export async function acceptFriendship(requesterId, currentUserId) {
+export async function acceptFriendship(userId, friendId) {
   await promisePool.query(
     'UPDATE friendships SET status = "accepted" WHERE user_id = ? AND friend_id = ?',
-    [requesterId, currentUserId]
+    [friendId, userId] 
   );
 }
 
-export async function rejectFriendship(requesterId, currentUserId) {
+export async function rejectFriendship(userId, friendId) {
   await promisePool.query(
     'UPDATE friendships SET status = "rejected" WHERE user_id = ? AND friend_id = ?',
-    [requesterId, currentUserId]
+    [friendId, userId]
   );
 }
+
 
 export async function getAcceptedFriendships(userId) {
   const [rows] = await promisePool.query(

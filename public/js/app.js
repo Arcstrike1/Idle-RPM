@@ -726,3 +726,5 @@ async function renderPendingRequests() {
             alertMessage.classList.add("failMessage");
         }
     });
+// Expose global game object for external modules (e.g., race overlay logic)
+window.game = game;

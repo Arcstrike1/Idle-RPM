@@ -143,10 +143,10 @@
 
     const difficultyLevels = {
         easy: { aiSpeed: 80, reward: 50, name: 'Easy' },
-        novice: { aiSpeed: 90, reward: 100, name: 'Novice' },
-        experienced: {aiSpeed: 110, reward: 150, name: "Experienced"},
-        pro: { aiSpeed: 130, reward: 200, name: 'Pro-Driver' },
-        veteran: { aiSpeed: 180, reward: 1000, name: 'Veteran' }
+        novice: { aiSpeed: 90, reward: 150, name: 'Novice' },
+        experienced: {aiSpeed: 110, reward: 200, name: "Experienced"},
+        pro: { aiSpeed: 130, reward: 500, name: 'Pro-Driver' },
+        veteran: { aiSpeed: 190, reward: 10000, name: 'Veteran' }
     };
 
     const raceState = {
@@ -289,15 +289,17 @@
             startAiRace(level);
         });
     });
-    document.addEventListener("keyup",function(event){
-        if(event.code === 'Space'){
-        if (!raceState.active) return;
+
+
+    document.addEventListener('keyup', function(event) {
+    if (event.code === 'Space') {
+         if (!raceState.active) return;
         raceState.playerSpeed += 5;
         raceState.player += 12;
         raceState.playerSpeed = Math.min(raceState.playerSpeed, 80);
-        }
-    })
-    
+    }
+    });
+
 
     raceEndButton.addEventListener('click', () => {
         if (raceState.interval) clearInterval(raceState.interval);

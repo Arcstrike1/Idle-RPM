@@ -69,7 +69,7 @@
                         </div>
                     </div>
                     <p style="color:#00ff00; margin:8px 0; text-align:center; font-size: 12px;" id="raceStatus">Tap fast!</p>
-                    <button id="raceTapButton" class="nav-button" style="width:100%; margin-bottom:6px; padding:10px; font-size:14px; background: #00cc00; color: #000; font-weight: bold; border: 2px solid #009900;">ACCELERATE</button>
+                    <button id="raceTapButton" class="nav-button" style="width:100%; margin-bottom:6px; padding:10px; font-size:14px; background: #00cc00; color: #000; font-weight: bold; border: 2px solid #009900;">SPACEBAR</button>
                     <button id="raceEndButton" class="nav-button" style="width:100%; padding:8px; font-size:12px; background:#444;border:1px solid #666;">Quit</button>
                 </div>
             </div>
@@ -203,10 +203,10 @@
 
     const difficultyLevels = {
         easy: { aiSpeed: 80, reward: 50, name: 'Easy' },
-        novice: { aiSpeed: 90, reward: 100, name: 'Novice' },
-        experienced: {aiSpeed: 110, reward: 150, name: "Experienced"},
-        pro: { aiSpeed: 130, reward: 200, name: 'Pro-Driver' },
-        veteran: { aiSpeed: 180, reward: 1000, name: 'Veteran' }
+        novice: { aiSpeed: 90, reward: 150, name: 'Novice' },
+        experienced: {aiSpeed: 110, reward: 200, name: "Experienced"},
+        pro: { aiSpeed: 130, reward: 500, name: 'Pro-Driver' },
+        veteran: { aiSpeed: 190, reward: 10000, name: 'Veteran' }
     };
 
     const raceState = {
@@ -350,12 +350,18 @@
         });
     });
 
-    raceTapButton.addEventListener('click', () => {
-        if (!raceState.active) return;
+
+    document.addEventListener('keyup', function(event) {
+    if (event.code === 'Space') {
+         if (!raceState.active) return;
         raceState.playerSpeed += 5;
         raceState.player += 12;
         raceState.playerSpeed = Math.min(raceState.playerSpeed, 80);
-    });
+    }
+});
+
+
+    
 
     raceEndButton.addEventListener('click', () => {
         if (raceState.interval) clearInterval(raceState.interval);

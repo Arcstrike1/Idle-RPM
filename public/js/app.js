@@ -5,7 +5,7 @@ const game ={
     // rubber per click
     // multipliers
     // timers
-    state: { rubber:0, rps:0, rpc:1, rmulti:1 },
+    state: { rubber: 0, rps: 0, rpc: 1, rmulti: 1, totalClicks: 0 },
     // array or dictionary of building objects
     // each building has:
     // - name
@@ -126,13 +126,199 @@ const game ={
     // - description
     // - condition function
     // - unlocked flag
-    achievements: [],
-    // list of active buffs
-    // each buff has:
-    // - name
-    // - duration
-    // - multiplier
-    // - type (click, rps, global)
+    achievements: [
+    // CLICK ACHIEVEMENTS
+    {
+        name: "First Click",
+        description: "Click the wheel 1 time.",
+        unlocked: false,
+        condition() {
+            return game.state.totalClicks >= 1;
+        }
+    },
+    {
+        name: "100 Clicks",
+        description: "Click the wheel 100 times.",
+        unlocked: false,
+        condition() {
+            return game.state.totalClicks >= 100;
+        }
+    },
+    {
+        name: "1,000 Clicks",
+        description: "Click the wheel 1,000 times.",
+        unlocked: false,
+        condition() {
+            return game.state.totalClicks >= 1000;
+        }
+    },
+    {
+        name: "10,000 Clicks",
+        description: "Click the wheel 10,000 times.",
+        unlocked: false,
+        condition() {
+            return game.state.totalClicks >= 10000;
+        }
+    },
+    {
+        name: "100,000 Clicks",
+        description: "Click the wheel 100,000 times.",
+        unlocked: false,
+        condition() {
+            return game.state.totalClicks >= 100000;
+        }
+    },
+    {
+        name: "1,000,000 Clicks",
+        description: "Click the wheel 1,000,000 times.",
+        unlocked: false,
+        condition() {
+            return game.state.totalClicks >= 1000000;
+        }
+    },
+
+    // RUBBER ACHIEVEMENTS
+    {
+        name: "100 Rubber",
+        description: "Reach 100 rubber.",
+        unlocked: false,
+        condition() {
+            return game.state.rubber >= 100;
+        }
+    },
+    {
+        name: "1,000 Rubber",
+        description: "Reach 1,000 rubber.",
+        unlocked: false,
+        condition() {
+            return game.state.rubber >= 1000;
+        }
+    },
+    {
+        name: "10,000 Rubber",
+        description: "Reach 10,000 rubber.",
+        unlocked: false,
+        condition() {
+            return game.state.rubber >= 10000;
+        }
+    },
+    {
+        name: "100,000 Rubber",
+        description: "Reach 100,000 rubber.",
+        unlocked: false,
+        condition() {
+            return game.state.rubber >= 100000;
+        }
+    },
+    {
+        name: "1,000,000 Rubber",
+        description: "Reach 1,000,000 rubber.",
+        unlocked: false,
+        condition() {
+            return game.state.rubber >= 1000000;
+        }
+    },
+    {
+        name: "1 Billion Rubber",
+        description: "Reach 1,000,000,000 rubber.",
+        unlocked: false,
+        condition() {
+            return game.state.rubber >= 1000000000;
+        }
+    },
+    {
+        name: "1 Trillion Rubber",
+        description: "Reach 1,000,000,000,000 rubber.",
+        unlocked: false,
+        condition() {
+            return game.state.rubber >= 1000000000000;
+        }
+    },
+
+    // BUILDING / UPGRADE ACHIEVEMENTS
+    {
+        name: "First Building",
+        description: "Buy your first building.",
+        unlocked: false,
+        condition() {
+            return game.buildings.some(b => b.count > 0);
+        }
+    },
+    {
+        name: "100 Buildings",
+        description: "Own 100 total buildings.",
+        unlocked: false,
+        condition() {
+            return game.buildings.reduce((sum, b) => sum + b.count, 0) >= 100;
+        }
+    },
+    {
+        name: "First Upgrade",
+        description: "Buy your first upgrade.",
+        unlocked: false,
+        condition() {
+            return game.upgrades.some(u => u.purchased);
+        }
+    },
+
+    // EXTRA ACHIEVEMENTS
+    {
+        name: "Passive Income",
+        description: "Reach 100 rubber per second.",
+        unlocked: false,
+        condition() {
+            return game.calculateTotalRPS() >= 100;
+        }
+    },
+    {
+        name: "Industrial Power",
+        description: "Reach 10,000 rubber per second.",
+        unlocked: false,
+        condition() {
+            return game.calculateTotalRPS() >= 10000;
+        }
+    },
+    {
+        name: "Street Mechanic",
+        description: "Own 10 Driveway Mechanics.",
+        unlocked: false,
+        condition() {
+            return game.buildings[0].count >= 10;
+        }
+    },
+    {
+        name: "Full Garage",
+        description: "Own 25 Garage Workshops.",
+        unlocked: false,
+        condition() {
+            return game.buildings[1].count >= 25;
+        }
+    },
+    {
+        name: "Master Tuner",
+        description: "Own 10 Tuners.",
+        unlocked: false,
+        condition() {
+            return game.buildings[5].count >= 10;
+        }
+    },
+    {
+        name: "Big Spender",
+        description: "Buy 3 upgrades.",
+        unlocked: false,
+        condition() {
+            return game.upgrades.filter(u => u.purchased).length >= 3;
+        }
+    },
+    {
+        name: "Upgrade King",
+        description: "Buy every upgrade.",
+        unlocked: false,
+        condition() {
+            return game.upgrades.filter(u => u.purchased).length === game.upgrades.length;
+            }
+        }
+    ],
     buffs: [],
     // each building that supports a minigame gets:
     // building.minigame = { ... }
@@ -148,28 +334,28 @@ const game ={
     // load save
     // start game loop
     init() {
-        console.log("Initializing game state...");
-        this.state = {
-            rubber: 0,
-            rps: 1,
-            rpc: 1,
-            rmulti: 1
-        };
-        // load any existing save (local or merged server)
-        this.load();
-        this.render();
-        this.startTickLoop();
+    console.log("Initializing game state...");
+    this.state = {
+        rubber: 0,
+        rps: 1,
+        rpc: 1,
+        rmulti: 1,
+        totalClicks: 0
+    };
 
-        const wheel = document.getElementById("gameWheel");
-        if(wheel) wheel.addEventListener("click", this.clickWheel.bind(this));
+    this.load();
+    this.render();
+    this.startTickLoop();
 
-        // autosave every 30 seconds
-        setInterval(() => this.save(true), 30000);
-        setInterval(()=> renderPendingRequests(),30000);
-        setInterval(()=> renderAcceptedRequests(),30000);
+    const wheel = document.getElementById("gameWheel");
+    if (wheel) wheel.addEventListener("click", this.clickWheel.bind(this));
+
+    setInterval(() => this.save(true), 30000);
+    setInterval(() => renderPendingRequests(), 30000);
+    setInterval(() => renderAcceptedRequests(), 30000);
     },
     // calculate total RPS from buildings and modifiers
-    calculateTotalRPS() {
+    calculateTotalRPS(){
         let total = 0;
         for (const b of this.buildings) {
             total += (b.baseRPS ) * (b.count );
@@ -234,13 +420,17 @@ const game ={
     // - minigame updates
     // - unlock checks
     update() {
-        const el = document.getElementById('rubber-count');
-        if (el) el.innerText = "Total Rubber: \n"+ Math.floor(this.state.rubber);
-        const el2 = document.getElementById('rps-count');
-        if(el2) el2.innerText = "Rubber per second: "+Math.floor(this.calculateTotalRPS());
-        const el3 = document.getElementById('rpc-count');
-        if(el3) el3.innerText = "Rubber per click: "+Math.floor(this.calculateTotalRPC());
-    },
+    this.checkAchievements();
+
+    const el = document.getElementById('rubber-count');
+    if (el) el.innerText = "Total Rubber: \n" + Math.floor(this.state.rubber);
+
+    const el2 = document.getElementById('rps-count');
+    if (el2) el2.innerText = "Rubber per second: " + Math.floor(this.calculateTotalRPS());
+
+    const el3 = document.getElementById('rpc-count');
+    if (el3) el3.innerText = "Rubber per click: " + Math.floor(this.calculateTotalRPC());
+},
     // updates UI elements:
     // - cookie count
     // - building buttons
@@ -303,7 +493,36 @@ const game ={
     upgradeFunctions: {},
     // check achievement conditions
     // unlock achievements
-    achievementFunctions: {},
+    
+    checkAchievements() {
+    for (const achievement of this.achievements) {
+        if (!achievement.unlocked && achievement.condition()) {
+            achievement.unlocked = true;
+            this.showAchievementToast(achievement);
+        }
+    }
+    },
+
+    showAchievementToast(achievement) {
+    const container = document.getElementById("achievement-container");
+    if (!container) return;
+
+    const toast = document.createElement("div");
+    toast.classList.add("achievement-toast");
+    toast.innerHTML = `
+        <strong>Achievement Unlocked!</strong><br>
+        ${achievement.name}
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add("fade-out");
+        setTimeout(() => {
+            toast.remove();
+        }, 400);
+    }, 5000);
+    },
     // add buff
     // remove buff
     // update buff timers
@@ -418,39 +637,36 @@ const game ={
         }
     },
     clickWheel() {
-        if (!this.state) {
+    if (!this.state) {
         console.error("Game state is not initialized.");
         return;
     }
-        const wheel = document.getElementById("gameWheel");
 
-        // Spin the wheel
-        wheel.style.transition = "transform 0.5s ease";
-        wheel.style.transform += "rotate(360deg)";
+    const wheel = document.getElementById("gameWheel");
 
-        // Create smoke effect
-        const smoke = document.createElement("div");
-        smoke.classList.add("smoke");
+    wheel.style.transition = "transform 0.5s ease";
+    wheel.style.transform += "rotate(360deg)";
 
-        // Position the smoke behind the wheel
-        const wheelRect = wheel.getBoundingClientRect();
-        smoke.style.position = "absolute";
-        smoke.style.left = `${wheelRect.left + wheelRect.width / 3.5}px`;
-        smoke.style.top = `${wheelRect.top + wheelRect.height / 2}px`;
-        smoke.style.transform = "translate(-50%, -50%)";
+    const smoke = document.createElement("div");
+    smoke.classList.add("smoke");
 
-        // Append smoke to the smoke space
-        const smokeSpace = document.getElementById("smokeSpace");
-        smokeSpace.appendChild(smoke);
+    const wheelRect = wheel.getBoundingClientRect();
+    smoke.style.position = "absolute";
+    smoke.style.left = `${wheelRect.left + wheelRect.width / 3.5}px`;
+    smoke.style.top = `${wheelRect.top + wheelRect.height / 2}px`;
+    smoke.style.transform = "translate(-50%, -50%)";
 
-        // Remove smoke after animation
-        setTimeout(() => {
-            smoke.remove();
-        }, 2000);
+    const smokeSpace = document.getElementById("smokeSpace");
+    smokeSpace.appendChild(smoke);
 
-        // Increment rubber count
-        this.state.rubber += this.calculateTotalRPC();
-    }
+    setTimeout(() => {
+        smoke.remove();
+    }, 2000);
+
+    this.state.rubber += this.calculateTotalRPC();
+    this.state.totalClicks++;
+    this.update();
+}
 };
 window.onload = async function(req,res) {
     game.init();
@@ -728,3 +944,5 @@ async function renderPendingRequests() {
     });
 // Expose global game object for external modules (e.g., race overlay logic)
 window.game = game;
+
+

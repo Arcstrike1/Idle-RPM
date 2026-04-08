@@ -11,7 +11,7 @@ router.get("/acceptedFriendships",ensureAuth,userController.acceptedRequests);
 
 router.post('/acceptFriendship',ensureAuth,userController.acceptFriendRequest);
 router.post('/rejectFriendship',ensureAuth,userController.rejectFriendRequest);
-
+router.post('/removeFriendship',ensureAuth,userController.removeFriend);
 
 router.get('/save', ensureAuth, userController.getSave);
 router.post('/save', ensureAuth, userController.saveGame);

@@ -532,21 +532,6 @@ function attachPendingHandlers() {
     });
 }
 
-function attachMessageHandlers() {
-    
-    document.querySelectorAll('.message-btn').forEach(btn => {
-        btn.addEventListener('click', async () => {
-            const id = btn.dataset.id;
-            
-            await fetch(`/users/messages?friendId=${id}`, {
-                method: 'GET',
-                credentials: 'include'
-            });
-            
-            renderAcceptedRequests();
-        });
-    });
-}
 
 // --- Data Loading ---
 async function loadActiveFriendships() {
@@ -572,19 +557,53 @@ async function renderAcceptedRequests() {
     const list = await loadActiveFriendships();
     const container = document.getElementById('acceptedRequests');
     if (!container) return;
-    console.log(list);
+
     container.innerHTML = '';
+
     list.forEach(friend => {
         const row = document.createElement('div');
         row.classList.add('accepted-row');
         row.innerHTML = `
             <span>${friend.name}</span>
             <button class="message-btn" data-id="${friend.id}">Message</button>
+            <button class="remove-btn" data-id="${friend.id}">Remove</button>
         `;
         container.appendChild(row);
     });
-    attachMessageHandlers();
+
+    document.getElementById('acceptedRequests').addEventListener('click', async (e) => {
+    const btn = e.target;
+
+    // Remove button
+    if (btn.classList.contains('remove-btn')) {
+        const id = btn.dataset.id;
+
+        await fetch('/users/removeFriendship', {
+            method: 'POST',
+            credentials: "include",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ friendId: id })
+        });
+
+        console.log("Remove clicked, re-rendering");
+        renderAcceptedRequests();
+    }
+
+    // Message button
+    if (btn.classList.contains('message-btn')) {
+        const id = btn.dataset.id;
+
+        await fetch(`/users/messages`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ friendId: id })
+        });
+    }
+});
+
 }
+
 
 async function renderPendingRequests() {
     const list = await loadPendingRequests();

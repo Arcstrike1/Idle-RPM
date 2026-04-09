@@ -42,6 +42,21 @@
                 </div>
                 <button id="raceButton" class="nav-button">Start Race</button>
             </div>
+            <div id="messageClickArea">
+                <div id="chat-popup" class="friend-form-popup" style="display:none; position:fixed; z-index:9;">
+                    <form id="chat-form">
+                        <span id="friendName">friend</span>
+                        <div class="message-list" style="border-radius:4px;padding:4px; margin:4px;background-color:whitesmoke ; flex: 1; overflow-y: auto; display: flex; flex-direction: column;">
+                            <div class="msg received" style="align-self: flex-start; color:tomato">Recieved</div>
+                            <div class="msg sent" style="align-self: flex-end; color:#009900">Sent</div>
+                        </div>
+                        <input type="hidden" id="recipient-id" name="friend_id">
+                        <textarea placeholder="Type your message..." required></textarea>
+                        <button type="submit">Send</button>
+                    </form>
+                </div>
+
+            </div>
             <div id="raceModal" class="modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.65); z-index:100; justify-content:center; align-items:center;">
                 <div style="background:#111; color:#fff; border: 2px solid #555; border-radius:8px; padding:20px; width:280px; text-align:center;">
                     <h3 style="margin-top:0;">Start Race</h3>

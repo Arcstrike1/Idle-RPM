@@ -565,43 +565,48 @@ async function renderAcceptedRequests() {
         row.classList.add('accepted-row');
         row.innerHTML = `
             <span>${friend.name}</span>
-            <button class="message-btn" data-id="${friend.id}">Message</button>
+            <button class="message-btn" data-name="${friend.name}"data-id="${friend.id}">Message</button>
             <button class="remove-btn" data-id="${friend.id}">Remove</button>
         `;
         container.appendChild(row);
     });
 
-    document.getElementById('acceptedRequests').addEventListener('click', async (e) => {
-    const btn = e.target;
+    // Attach ONE delegated listener
+    container.onclick = async (e) => {
+        const btn = e.target;
 
-    // Remove button
-    if (btn.classList.contains('remove-btn')) {
-        const id = btn.dataset.id;
+        // Remove button
+        if (btn.classList.contains('remove-btn')) {
+            const id = btn.dataset.id;
 
-        await fetch('/users/removeFriendship', {
-            method: 'POST',
-            credentials: "include",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ friendId: id })
-        });
+            await fetch('/users/removeFriendship', {
+                method: 'POST',
+                credentials: "include",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ friendId: id })
+            });
 
-        console.log("Remove clicked, re-rendering");
-        renderAcceptedRequests();
-    }
+            console.log("Remove clicked, re-rendering");
+            renderAcceptedRequests();
+            return;
+        }
 
-    // Message button
-    if (btn.classList.contains('message-btn')) {
-        const id = btn.dataset.id;
-
-        await fetch(`/users/messages`, {
-            method: 'GET',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ friendId: id })
-        });
-    }
-});
-
+        // Message button
+        if (btn.classList.contains('message-btn')) {
+            const id = btn.dataset.id;
+            const name = btn.dataset.name;
+            document.getElementById("friendName").innerText ="";
+            document.getElementById("friendName").innerText =`Messages with ${name}`;
+            dragWindow(document.getElementById("messageClickArea"),document.getElementById("chat-popup"))
+            document.getElementById("recipient-id").value = id;
+            if(document.getElementById("chat-popup").style.display == "block"){
+                document.getElementById("chat-popup").style.display = "none"
+            }else{
+                document.getElementById("chat-popup").style.display = "block"
+            }
+            return;
+        }
+    };
 }
 
 

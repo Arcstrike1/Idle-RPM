@@ -10,12 +10,26 @@
     border-radius: 100%;
     position: relative;
 }
-body{
-    background-image: url(../Game/images/mainBack.png);
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
+@keyframes scrollBackground {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        
+        background-position: 100% 0; 
+    }
 }
+
+body {
+    background-image: url(/Game/images/mainBack.svg);
+    background-color: rgb(96, 187, 255);
+    background-repeat: repeat-x;
+    background-size: auto 100%; 
+    animation: scrollBackground 10s linear infinite;
+    margin: 0;
+    padding: 0;
+}
+
 /* #gameWheel:hover {
     transition: .5s ease all;
     width: 250px;

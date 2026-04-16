@@ -53,17 +53,34 @@ export async function createFriendship(requesterId,currentUserId){
 }
 export async function acceptFriendship(userId, friendId) {
   await promisePool.query(
-    'UPDATE friendships SET status = "accepted" WHERE user_id = ? AND friend_id = ?',
-    [friendId, userId] 
+    `UPDATE friendships 
+     SET status = "accepted" 
+     WHERE (user_id = ? AND friend_id = ?)
+        OR (user_id = ? AND friend_id = ?)`,
+    [userId, friendId, friendId, userId]
   );
 }
 
+
 export async function rejectFriendship(userId, friendId) {
   await promisePool.query(
-    'UPDATE friendships SET status = "rejected" WHERE user_id = ? AND friend_id = ?',
-    [friendId, userId]
+    `UPDATE friendships 
+     SET status = "blocked" 
+     WHERE (user_id = ? AND friend_id = ?)
+        OR (user_id = ? AND friend_id = ?)`,
+    [userId, friendId, friendId, userId]
   );
 }
+
+export async function removeFriendship(userId, friendId) {
+  await promisePool.query(
+    `DELETE FROM friendships 
+     WHERE (user_id = ? AND friend_id = ?)
+        OR (user_id = ? AND friend_id = ?)`,
+    [userId, friendId, friendId, userId]
+  );
+}
+
 
 
 export async function getAcceptedFriendships(userId) {
@@ -122,5 +139,6 @@ export default {
   getPendingFriendships,
   getAcceptedFriendships,
   acceptFriendship,
-  rejectFriendship
+  rejectFriendship,
+  removeFriendship
 };

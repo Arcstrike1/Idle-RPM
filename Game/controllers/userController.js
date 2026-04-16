@@ -41,6 +41,25 @@ const getUser = async (req, res) => {
     return res.status(500).json({ error: 'Server couldn’t find user' });
   }
 };
+
+const getUserByUsername = async (req, res) => {
+  try {
+    const username = req.query.username?.trim();
+    if (!username) return res.status(400).json({ error: 'Username is required' });
+
+    const user = await queries.getUserByUsername(username);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    return res.json({
+      id: user.id,
+      userName: user.username
+    });
+  } catch (e) {
+    console.error('Get user by username error', e);
+    return res.status(500).json({ error: 'Server error' });
+  }
+};
+
 const addFriend = async (req, res) => {
   try {
     const userId = req.session?.userId;
@@ -140,6 +159,7 @@ const acceptFriendRequest = async (req, res) => {
     }
     let friendId = req.body.friendId;
     queries.acceptFriendship(friendId,userId);
+    return res.json({ success: true });
   }catch(e){
     console.error('Request Accept error', e);
     return res.status(500).json({ error: 'Server couldn’t accept request' });
@@ -153,9 +173,24 @@ const rejectFriendRequest = async (req, res) => {
     }
     let friendId = req.body.friendId;
     queries.rejectFriendship(friendId,userId);
+    return res.json({ success: true });
   }catch(e){
     console.error('Reject Request error', e);
     return res.status(500).json({ error: 'Server couldn’t Reject Request' });
+  }
+}
+const removeFriend = async (req, res) => {
+  try{
+    const userId = req.session?.userId;
+    if(!userId){
+      return res.status(401).json({ error: 'Unauthorized'})
+    }
+    let friendId = req.body.friendId;
+    queries.removeFriendship(friendId,userId);
+    return res.json({ success: true });
+  }catch(e){
+    console.error("Removal Error",e);
+    return res.status(500).json({ error: 'Server Couldn’t Remove Friendship' });
   }
 }
 const acceptedRequests = async (req, res) => {
@@ -228,5 +263,7 @@ export default  {
   pendingRequests,
   acceptedRequests,
   acceptFriendRequest,
-  rejectFriendRequest
+  rejectFriendRequest,
+  removeFriend,
+  getUserByUsername
 };

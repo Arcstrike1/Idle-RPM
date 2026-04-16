@@ -41,6 +41,25 @@ const getUser = async (req, res) => {
     return res.status(500).json({ error: 'Server couldn’t find user' });
   }
 };
+
+const getUserByUsername = async (req, res) => {
+  try {
+    const username = req.query.username?.trim();
+    if (!username) return res.status(400).json({ error: 'Username is required' });
+
+    const user = await queries.getUserByUsername(username);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    return res.json({
+      id: user.id,
+      userName: user.username
+    });
+  } catch (e) {
+    console.error('Get user by username error', e);
+    return res.status(500).json({ error: 'Server error' });
+  }
+};
+
 const addFriend = async (req, res) => {
   try {
     const userId = req.session?.userId;
@@ -245,5 +264,6 @@ export default  {
   acceptedRequests,
   acceptFriendRequest,
   rejectFriendRequest,
-  removeFriend
+  removeFriend,
+  getUserByUsername
 };

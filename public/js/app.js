@@ -595,15 +595,10 @@ async function renderAcceptedRequests() {
         if (btn.classList.contains('message-btn')) {
             const id = btn.dataset.id;
             const name = btn.dataset.name;
-            document.getElementById("friendName").innerText ="";
-            document.getElementById("friendName").innerText =`Messages with ${name}`;
-            dragWindow(document.getElementById("messageClickArea"),document.getElementById("chat-popup"))
-            document.getElementById("recipient-id").value = id;
-            if(document.getElementById("chat-popup").style.display == "block"){
-                document.getElementById("chat-popup").style.display = "none"
-            }else{
-                document.getElementById("chat-popup").style.display = "block"
-            }
+            await setChatTarget(id, name);
+            dragWindow(document.getElementById("messageClickArea"), document.getElementById("chat-popup"));
+            const popup = document.getElementById("chat-popup");
+            popup.style.display = popup.style.display === "block" ? "none" : "block";
             return;
         }
     };
@@ -629,6 +624,152 @@ async function renderPendingRequests() {
     attachPendingHandlers();
 }
 
+let chatState = {
+    currentPeerId: null,
+    currentPeerName: '',
+    currentUserId: null,
+    lastMessageId: 0,
+    polling: false,
+    displayedMessageIds: new Set()
+};
+
+function showChatError(message) {
+    const el = document.getElementById('chat-error');
+    if (el) el.textContent = message || '';
+}
+
+function appendChatMessage(message) {
+    if (chatState.displayedMessageIds.has(message.id)) return;
+    chatState.displayedMessageIds.add(message.id);
+
+    const list = document.querySelector('#chat-popup .message-list');
+    if (!list) return;
+    const bubble = document.createElement('div');
+    const isMine = message.fromUserId === chatState.currentUserId;
+    bubble.className = isMine ? 'msg sent' : 'msg received';
+    bubble.style.alignSelf = isMine ? 'flex-end' : 'flex-start';
+    bubble.style.color = isMine ? '#009900' : 'tomato';
+    bubble.style.background = isMine ? '#e5ffe5' : '#fff0f0';
+    bubble.style.borderRadius = '6px';
+    bubble.style.padding = '6px 8px';
+    bubble.style.margin = '3px 0';
+    bubble.innerHTML = `<strong>${isMine ? 'You' : message.fromUsername}:</strong><br>${message.text}`;
+    list.appendChild(bubble);
+    list.scrollTop = list.scrollHeight;
+}
+
+function renderChatHistory(messages) {
+    const list = document.querySelector('#chat-popup .message-list');
+    if (!list) return;
+    list.innerHTML = '';
+    chatState.displayedMessageIds.clear();
+    messages.sort((a, b) => a.id - b.id).forEach(appendChatMessage);
+}
+
+async function loadChatHistory(peerId) {
+    if (!peerId) return;
+
+    const res = await fetch(`/chat/conversation?peerId=${encodeURIComponent(peerId)}`, {
+        method: 'GET',
+        credentials: 'include'
+    });
+
+    if (!res.ok) return;
+    const data = await res.json();
+    if (Array.isArray(data.messages)) {
+        renderChatHistory(data.messages);
+        data.messages.forEach(msg => {
+            if (msg.id > chatState.lastMessageId) chatState.lastMessageId = msg.id;
+        });
+    }
+}
+
+async function setChatTarget(peerId, peerName) {
+    chatState.currentPeerId = Number(peerId);
+    chatState.currentPeerName = peerName;
+    document.getElementById('recipient-id').value = peerId;
+    document.getElementById('friendName').innerText = `Messages with ${peerName}`;
+    showChatError('');
+    await loadChatHistory(peerId);
+}
+
+async function openChatByUsername() {
+    const username = document.getElementById('chat-recipient-username').value.trim();
+    if (!username) {
+        showChatError('Enter a username to chat with');
+        return;
+    }
+
+    const res = await fetch(`/users/userByUsername?username=${encodeURIComponent(username)}`, {
+        method: 'GET',
+        credentials: 'include'
+    });
+    const json = await res.json();
+    if (!res.ok) {
+        showChatError(json.error || 'User not found');
+        return;
+    }
+
+    await setChatTarget(json.id, json.userName);
+    document.getElementById('chat-popup').style.display = 'block';
+}
+
+async function sendChatMessage(text) {
+    if (!chatState.currentPeerId) {
+        showChatError('Open a chat target first');
+        return;
+    }
+    if (!text) return;
+
+    const res = await fetch('/chat/send', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipientId: chatState.currentPeerId, text })
+    });
+
+    const json = await res.json();
+    if (!res.ok) {
+        showChatError(json.error || 'Send failed');
+        return;
+    }
+
+    if (json.message) {
+        appendChatMessage(json.message);
+        if (json.message.id > chatState.lastMessageId) chatState.lastMessageId = json.message.id;
+    }
+}
+
+async function pollChatLoop() {
+    if (!chatState.currentUserId) return;
+    try {
+        const res = await fetch(`/chat/poll?since=${chatState.lastMessageId}`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.messages) && data.messages.length) {
+                data.messages.sort((a, b) => a.id - b.id).forEach(message => {
+                    if (message.id > chatState.lastMessageId) chatState.lastMessageId = message.id;
+                    if (message.fromUserId === chatState.currentPeerId || message.toUserId === chatState.currentPeerId) {
+                        appendChatMessage(message);
+                    }
+                });
+            }
+        }
+    } catch (err) {
+        console.warn('Chat poll failed', err);
+    } finally {
+        setTimeout(pollChatLoop, 100);
+    }
+}
+
+function startChatPolling() {
+    if (!chatState.currentUserId || chatState.polling) return;
+    chatState.polling = true;
+    pollChatLoop();
+}
 
 
     let friendList = document.getElementById("friendList");
@@ -706,6 +847,8 @@ async function renderPendingRequests() {
 
     if (userInfo && userInfo.userName) {
         userName.innerHTML = `${userInfo.userName}'s Garage`;
+        chatState.currentUserId = userInfo.id;
+        startChatPolling();
     } else {
         userName.innerHTML = "Unknown User";
     }
@@ -713,6 +856,19 @@ async function renderPendingRequests() {
     document.getElementById('logoutButton').addEventListener('click', () => {
         window.location.href = '/logout';
     });
+
+    document.getElementById('chat-open-user-button').addEventListener('click', async () => {
+        await openChatByUsername();
+    });
+
+    document.getElementById('chat-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const text = document.getElementById('chat-input').value.trim();
+        if (!text) return;
+        await sendChatMessage(text);
+        document.getElementById('chat-input').value = '';
+    });
+
     let alertMessage = document.getElementById("alertMessage");
 
     document.getElementById('friendRequestButton').addEventListener('click', async (e) => {

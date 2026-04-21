@@ -133,8 +133,6 @@ app.get('/chat/poll', (req, res) => {
   addWaitingClient(userId, { res, timeout });
 });
 
-const PORT = process.env.PORT || 3000;
-
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname,'public','login.html'));
 });

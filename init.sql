@@ -1,7 +1,7 @@
--- Create application user with proper permissions
-CREATE USER IF NOT EXISTS 'idle_rpm_main'@'%' IDENTIFIED BY 'userpassword';
+CREATE USER 'idle_rpm_main'@'%' IDENTIFIED BY 'idleadmin155';
 GRANT ALL PRIVILEGES ON idlerpm.* TO 'idle_rpm_main'@'%';
 FLUSH PRIVILEGES;
+
 
 -- Use the correct database
 USE idlerpm;

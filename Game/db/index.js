@@ -27,4 +27,4 @@ pool.getConnection()
   });
 
 export const promisePool = pool;
-export { pool, connector };
+export { pool };

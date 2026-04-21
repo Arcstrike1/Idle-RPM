@@ -1,10 +1,10 @@
 -- Create application user with proper permissions
-CREATE USER IF NOT EXISTS 'idle_user'@'%' IDENTIFIED BY 'userpassword';
-GRANT ALL PRIVILEGES ON idle_rpm.* TO 'idle_user'@'%';
+CREATE USER IF NOT EXISTS 'idle_rpm_main'@'%' IDENTIFIED BY 'userpassword';
+GRANT ALL PRIVILEGES ON idlerpm.* TO 'idle_user'@'%';
 FLUSH PRIVILEGES;
 
 -- Use the correct database
-USE idle_rpm;
+USE idlerpm;
 
 -- Create tables
 CREATE TABLE IF NOT EXISTS users(

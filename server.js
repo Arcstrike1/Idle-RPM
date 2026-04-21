@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use("/Game", express.static(path.join(__dirname, "Game")));
 app.use(cors({
-    origin: 'http://localhost:3000', 
+    origin: 'http://8.228.76.117:3000', 
     credentials: true
 }));
 import { promisePool } from "./Game/db/index.js";

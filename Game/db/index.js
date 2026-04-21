@@ -2,22 +2,20 @@ import 'dotenv/config';
 import mysql from 'mysql2/promise';
 import { Connector } from '@google-cloud/cloud-sql-connector';
 
-const connector = new Connector();
-
-const clientOpts = await connector.getOptions({
-  instanceConnectionName: process.env.CLOUD_SQL_INSTANCE,
-  ipType: 'PUBLIC', 
-});
 
 const pool = mysql.createPool({
-  ...clientOpts,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD, 
-  database: process.env.DB_NAME, 
+  host: process.env.DB_HOST,      // "db"
+  port: process.env.DB_PORT,      // 3306
+  user: process.env.DB_USER,      // idle_user
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
 });
+
+export default pool;
+
 
 pool.getConnection()
   .then((connection) => {

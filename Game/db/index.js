@@ -1,24 +1,33 @@
-import mysql  from 'mysql2';
+import 'dotenv/config';
+import mysql from 'mysql2/promise';
+import { Connector } from '@google-cloud/cloud-sql-connector';
 
-let pool = mysql.createPool({
-  host: process.env.DB_HOST,
+const connector = new Connector();
+
+const clientOpts = await connector.getOptions({
+  instanceConnectionName: process.env.CLOUD_SQL_INSTANCE,
+  ipType: 'PUBLIC', 
+});
+
+const pool = mysql.createPool({
+  ...clientOpts,
   user: process.env.DB_USER,
-  password: process.env.DB_PASS, 
-  database: process.env.DB_NAME, 
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
 });
 
-pool.getConnection((err, connection) => {
-  if (err) {
+pool.getConnection()
+  .then((connection) => {
+    console.log('DB Connected');
+    connection.release();
+  })
+  .catch((err) => {
     console.error('DB connection error:', err);
     throw err;
-  }
-  console.log('DB Connected');
-  if (connection) connection.release();
-});
+  });
 
-export const promisePool = pool.promise();
-export { pool };
-
+export const promisePool = pool;
+export { pool, connector };

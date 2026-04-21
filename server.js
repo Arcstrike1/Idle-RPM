@@ -3,6 +3,7 @@ import path from 'path'
 import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from "url";
+const PORT = process.env.PORT || 3000;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -132,7 +133,7 @@ app.get('/chat/poll', (req, res) => {
   addWaitingClient(userId, { res, timeout });
 });
 
-const PORT = 3000;
+
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname,'public','login.html'));

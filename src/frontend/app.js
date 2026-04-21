@@ -5,7 +5,7 @@ const game ={
     // rubber per click
     // multipliers
     // timers
-    state: { rubber:0, rps:0, rpc:1, rmulti:1 },
+    state: { rubber: 0, rps: 0, rpc: 1, rmulti: 1, totalClicks: 0 },
     // array or dictionary of building objects
     // each building has:
     // - name
@@ -126,13 +126,199 @@ const game ={
     // - description
     // - condition function
     // - unlocked flag
-    achievements: [],
-    // list of active buffs
-    // each buff has:
-    // - name
-    // - duration
-    // - multiplier
-    // - type (click, rps, global)
+    achievements: [
+    // CLICK ACHIEVEMENTS
+    {
+        name: "First Click",
+        description: "Click the wheel 1 time.",
+        unlocked: false,
+        condition() {
+            return game.state.totalClicks >= 1;
+        }
+    },
+    {
+        name: "100 Clicks",
+        description: "Click the wheel 100 times.",
+        unlocked: false,
+        condition() {
+            return game.state.totalClicks >= 100;
+        }
+    },
+    {
+        name: "1,000 Clicks",
+        description: "Click the wheel 1,000 times.",
+        unlocked: false,
+        condition() {
+            return game.state.totalClicks >= 1000;
+        }
+    },
+    {
+        name: "10,000 Clicks",
+        description: "Click the wheel 10,000 times.",
+        unlocked: false,
+        condition() {
+            return game.state.totalClicks >= 10000;
+        }
+    },
+    {
+        name: "100,000 Clicks",
+        description: "Click the wheel 100,000 times.",
+        unlocked: false,
+        condition() {
+            return game.state.totalClicks >= 100000;
+        }
+    },
+    {
+        name: "1,000,000 Clicks",
+        description: "Click the wheel 1,000,000 times.",
+        unlocked: false,
+        condition() {
+            return game.state.totalClicks >= 1000000;
+        }
+    },
+
+    // RUBBER ACHIEVEMENTS
+    {
+        name: "100 Rubber",
+        description: "Reach 100 rubber.",
+        unlocked: false,
+        condition() {
+            return game.state.rubber >= 100;
+        }
+    },
+    {
+        name: "1,000 Rubber",
+        description: "Reach 1,000 rubber.",
+        unlocked: false,
+        condition() {
+            return game.state.rubber >= 1000;
+        }
+    },
+    {
+        name: "10,000 Rubber",
+        description: "Reach 10,000 rubber.",
+        unlocked: false,
+        condition() {
+            return game.state.rubber >= 10000;
+        }
+    },
+    {
+        name: "100,000 Rubber",
+        description: "Reach 100,000 rubber.",
+        unlocked: false,
+        condition() {
+            return game.state.rubber >= 100000;
+        }
+    },
+    {
+        name: "1,000,000 Rubber",
+        description: "Reach 1,000,000 rubber.",
+        unlocked: false,
+        condition() {
+            return game.state.rubber >= 1000000;
+        }
+    },
+    {
+        name: "1 Billion Rubber",
+        description: "Reach 1,000,000,000 rubber.",
+        unlocked: false,
+        condition() {
+            return game.state.rubber >= 1000000000;
+        }
+    },
+    {
+        name: "1 Trillion Rubber",
+        description: "Reach 1,000,000,000,000 rubber.",
+        unlocked: false,
+        condition() {
+            return game.state.rubber >= 1000000000000;
+        }
+    },
+
+    // BUILDING / UPGRADE ACHIEVEMENTS
+    {
+        name: "First Building",
+        description: "Buy your first building.",
+        unlocked: false,
+        condition() {
+            return game.buildings.some(b => b.count > 0);
+        }
+    },
+    {
+        name: "100 Buildings",
+        description: "Own 100 total buildings.",
+        unlocked: false,
+        condition() {
+            return game.buildings.reduce((sum, b) => sum + b.count, 0) >= 100;
+        }
+    },
+    {
+        name: "First Upgrade",
+        description: "Buy your first upgrade.",
+        unlocked: false,
+        condition() {
+            return game.upgrades.some(u => u.purchased);
+        }
+    },
+
+    // EXTRA ACHIEVEMENTS
+    {
+        name: "Passive Income",
+        description: "Reach 100 rubber per second.",
+        unlocked: false,
+        condition() {
+            return game.calculateTotalRPS() >= 100;
+        }
+    },
+    {
+        name: "Industrial Power",
+        description: "Reach 10,000 rubber per second.",
+        unlocked: false,
+        condition() {
+            return game.calculateTotalRPS() >= 10000;
+        }
+    },
+    {
+        name: "Street Mechanic",
+        description: "Own 10 Driveway Mechanics.",
+        unlocked: false,
+        condition() {
+            return game.buildings[0].count >= 10;
+        }
+    },
+    {
+        name: "Full Garage",
+        description: "Own 25 Garage Workshops.",
+        unlocked: false,
+        condition() {
+            return game.buildings[1].count >= 25;
+        }
+    },
+    {
+        name: "Master Tuner",
+        description: "Own 10 Tuners.",
+        unlocked: false,
+        condition() {
+            return game.buildings[5].count >= 10;
+        }
+    },
+    {
+        name: "Big Spender",
+        description: "Buy 3 upgrades.",
+        unlocked: false,
+        condition() {
+            return game.upgrades.filter(u => u.purchased).length >= 3;
+        }
+    },
+    {
+        name: "Upgrade King",
+        description: "Buy every upgrade.",
+        unlocked: false,
+        condition() {
+            return game.upgrades.filter(u => u.purchased).length === game.upgrades.length;
+            }
+        }
+    ],
     buffs: [],
     // each building that supports a minigame gets:
     // building.minigame = { ... }
@@ -148,28 +334,28 @@ const game ={
     // load save
     // start game loop
     init() {
-        console.log("Initializing game state...");
-        this.state = {
-            rubber: 0,
-            rps: 1,
-            rpc: 1,
-            rmulti: 1
-        };
-        // load any existing save (local or merged server)
-        this.load();
-        this.render();
-        this.startTickLoop();
+    console.log("Initializing game state...");
+    this.state = {
+        rubber: 0,
+        rps: 1,
+        rpc: 1,
+        rmulti: 1,
+        totalClicks: 0
+    };
 
-        const wheel = document.getElementById("gameWheel");
-        if(wheel) wheel.addEventListener("click", this.clickWheel.bind(this));
+    this.load();
+    this.render();
+    this.startTickLoop();
 
-        // autosave every 30 seconds
-        setInterval(() => this.save(true), 30000);
-        setInterval(()=> renderPendingRequests(),30000);
-        setInterval(()=> renderAcceptedRequests(),30000);
+    const wheel = document.getElementById("gameWheel");
+    if (wheel) wheel.addEventListener("click", this.clickWheel.bind(this));
+
+    setInterval(() => this.save(true), 30000);
+    setInterval(() => renderPendingRequests(), 30000);
+    setInterval(() => renderAcceptedRequests(), 30000);
     },
     // calculate total RPS from buildings and modifiers
-    calculateTotalRPS() {
+    calculateTotalRPS(){
         let total = 0;
         for (const b of this.buildings) {
             total += (b.baseRPS ) * (b.count );
@@ -234,13 +420,17 @@ const game ={
     // - minigame updates
     // - unlock checks
     update() {
-        const el = document.getElementById('rubber-count');
-        if (el) el.innerText = "Total Rubber: \n"+ Math.floor(this.state.rubber);
-        const el2 = document.getElementById('rps-count');
-        if(el2) el2.innerText = "Rubber per second: "+Math.floor(this.calculateTotalRPS());
-        const el3 = document.getElementById('rpc-count');
-        if(el3) el3.innerText = "Rubber per click: "+Math.floor(this.calculateTotalRPC());
-    },
+    this.checkAchievements();
+
+    const el = document.getElementById('rubber-count');
+    if (el) el.innerText = "Total Rubber: \n" + Math.floor(this.state.rubber);
+
+    const el2 = document.getElementById('rps-count');
+    if (el2) el2.innerText = "Rubber per second: " + Math.floor(this.calculateTotalRPS());
+
+    const el3 = document.getElementById('rpc-count');
+    if (el3) el3.innerText = "Rubber per click: " + Math.floor(this.calculateTotalRPC());
+},
     // updates UI elements:
     // - cookie count
     // - building buttons
@@ -303,7 +493,36 @@ const game ={
     upgradeFunctions: {},
     // check achievement conditions
     // unlock achievements
-    achievementFunctions: {},
+    
+    checkAchievements() {
+    for (const achievement of this.achievements) {
+        if (!achievement.unlocked && achievement.condition()) {
+            achievement.unlocked = true;
+            this.showAchievementToast(achievement);
+        }
+    }
+    },
+
+    showAchievementToast(achievement) {
+    const container = document.getElementById("achievement-container");
+    if (!container) return;
+
+    const toast = document.createElement("div");
+    toast.classList.add("achievement-toast");
+    toast.innerHTML = `
+        <strong>Achievement Unlocked!</strong><br>
+        ${achievement.name}
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add("fade-out");
+        setTimeout(() => {
+            toast.remove();
+        }, 400);
+    }, 5000);
+    },
     // add buff
     // remove buff
     // update buff timers
@@ -418,39 +637,36 @@ const game ={
         }
     },
     clickWheel() {
-        if (!this.state) {
+    if (!this.state) {
         console.error("Game state is not initialized.");
         return;
     }
-        const wheel = document.getElementById("gameWheel");
 
-        // Spin the wheel
-        wheel.style.transition = "transform 0.5s ease";
-        wheel.style.transform += "rotate(360deg)";
+    const wheel = document.getElementById("gameWheel");
 
-        // Create smoke effect
-        const smoke = document.createElement("div");
-        smoke.classList.add("smoke");
+    wheel.style.transition = "transform 0.5s ease";
+    wheel.style.transform += "rotate(360deg)";
 
-        // Position the smoke behind the wheel
-        const wheelRect = wheel.getBoundingClientRect();
-        smoke.style.position = "absolute";
-        smoke.style.left = `${wheelRect.left + wheelRect.width / 3.5}px`;
-        smoke.style.top = `${wheelRect.top + wheelRect.height / 2}px`;
-        smoke.style.transform = "translate(-50%, -50%)";
+    const smoke = document.createElement("div");
+    smoke.classList.add("smoke");
 
-        // Append smoke to the smoke space
-        const smokeSpace = document.getElementById("smokeSpace");
-        smokeSpace.appendChild(smoke);
+    const wheelRect = wheel.getBoundingClientRect();
+    smoke.style.position = "absolute";
+    smoke.style.left = `${wheelRect.left + wheelRect.width / 3.5}px`;
+    smoke.style.top = `${wheelRect.top + wheelRect.height / 2}px`;
+    smoke.style.transform = "translate(-50%, -50%)";
 
-        // Remove smoke after animation
-        setTimeout(() => {
-            smoke.remove();
-        }, 2000);
+    const smokeSpace = document.getElementById("smokeSpace");
+    smokeSpace.appendChild(smoke);
 
-        // Increment rubber count
-        this.state.rubber += this.calculateTotalRPC();
-    }
+    setTimeout(() => {
+        smoke.remove();
+    }, 2000);
+
+    this.state.rubber += this.calculateTotalRPC();
+    this.state.totalClicks++;
+    this.update();
+}
 };
 window.onload = async function(req,res) {
     game.init();
@@ -532,6 +748,21 @@ function attachPendingHandlers() {
     });
 }
 
+function attachMessageHandlers() {
+    
+    document.querySelectorAll('.message-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+            
+            await fetch(`/users/messages?friendId=${id}`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            
+            renderAcceptedRequests();
+        });
+    });
+}
 
 // --- Data Loading ---
 async function loadActiveFriendships() {
@@ -557,53 +788,19 @@ async function renderAcceptedRequests() {
     const list = await loadActiveFriendships();
     const container = document.getElementById('acceptedRequests');
     if (!container) return;
-
+    console.log(list);
     container.innerHTML = '';
-
     list.forEach(friend => {
         const row = document.createElement('div');
         row.classList.add('accepted-row');
         row.innerHTML = `
             <span>${friend.name}</span>
-            <button class="message-btn" data-name="${friend.name}"data-id="${friend.id}">Message</button>
-            <button class="remove-btn" data-id="${friend.id}">Remove</button>
+            <button class="message-btn" data-id="${friend.id}">Message</button>
         `;
         container.appendChild(row);
     });
-
-    // Attach ONE delegated listener
-    container.onclick = async (e) => {
-        const btn = e.target;
-
-        // Remove button
-        if (btn.classList.contains('remove-btn')) {
-            const id = btn.dataset.id;
-
-            await fetch('/users/removeFriendship', {
-                method: 'POST',
-                credentials: "include",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ friendId: id })
-            });
-
-            console.log("Remove clicked, re-rendering");
-            renderAcceptedRequests();
-            return;
-        }
-
-        // Message button
-        if (btn.classList.contains('message-btn')) {
-            const id = btn.dataset.id;
-            const name = btn.dataset.name;
-            await setChatTarget(id, name);
-            dragWindow(document.getElementById("messageClickArea"), document.getElementById("chat-popup"));
-            const popup = document.getElementById("chat-popup");
-            popup.style.display = popup.style.display === "block" ? "none" : "block";
-            return;
-        }
-    };
+    attachMessageHandlers();
 }
-
 
 async function renderPendingRequests() {
     const list = await loadPendingRequests();
@@ -624,152 +821,6 @@ async function renderPendingRequests() {
     attachPendingHandlers();
 }
 
-let chatState = {
-    currentPeerId: null,
-    currentPeerName: '',
-    currentUserId: null,
-    lastMessageId: 0,
-    polling: false,
-    displayedMessageIds: new Set()
-};
-
-function showChatError(message) {
-    const el = document.getElementById('chat-error');
-    if (el) el.textContent = message || '';
-}
-
-function appendChatMessage(message) {
-    if (chatState.displayedMessageIds.has(message.id)) return;
-    chatState.displayedMessageIds.add(message.id);
-
-    const list = document.querySelector('#chat-popup .message-list');
-    if (!list) return;
-    const bubble = document.createElement('div');
-    const isMine = message.fromUserId === chatState.currentUserId;
-    bubble.className = isMine ? 'msg sent' : 'msg received';
-    bubble.style.alignSelf = isMine ? 'flex-end' : 'flex-start';
-    bubble.style.color = isMine ? '#009900' : 'tomato';
-    bubble.style.background = isMine ? '#e5ffe5' : '#fff0f0';
-    bubble.style.borderRadius = '6px';
-    bubble.style.padding = '6px 8px';
-    bubble.style.margin = '3px 0';
-    bubble.innerHTML = `<strong>${isMine ? 'You' : message.fromUsername}:</strong><br>${message.text}`;
-    list.appendChild(bubble);
-    list.scrollTop = list.scrollHeight;
-}
-
-function renderChatHistory(messages) {
-    const list = document.querySelector('#chat-popup .message-list');
-    if (!list) return;
-    list.innerHTML = '';
-    chatState.displayedMessageIds.clear();
-    messages.sort((a, b) => a.id - b.id).forEach(appendChatMessage);
-}
-
-async function loadChatHistory(peerId) {
-    if (!peerId) return;
-
-    const res = await fetch(`/chat/conversation?peerId=${encodeURIComponent(peerId)}`, {
-        method: 'GET',
-        credentials: 'include'
-    });
-
-    if (!res.ok) return;
-    const data = await res.json();
-    if (Array.isArray(data.messages)) {
-        renderChatHistory(data.messages);
-        data.messages.forEach(msg => {
-            if (msg.id > chatState.lastMessageId) chatState.lastMessageId = msg.id;
-        });
-    }
-}
-
-async function setChatTarget(peerId, peerName) {
-    chatState.currentPeerId = Number(peerId);
-    chatState.currentPeerName = peerName;
-    document.getElementById('recipient-id').value = peerId;
-    document.getElementById('friendName').innerText = `Messages with ${peerName}`;
-    showChatError('');
-    await loadChatHistory(peerId);
-}
-
-async function openChatByUsername() {
-    const username = document.getElementById('chat-recipient-username').value.trim();
-    if (!username) {
-        showChatError('Enter a username to chat with');
-        return;
-    }
-
-    const res = await fetch(`/users/userByUsername?username=${encodeURIComponent(username)}`, {
-        method: 'GET',
-        credentials: 'include'
-    });
-    const json = await res.json();
-    if (!res.ok) {
-        showChatError(json.error || 'User not found');
-        return;
-    }
-
-    await setChatTarget(json.id, json.userName);
-    document.getElementById('chat-popup').style.display = 'block';
-}
-
-async function sendChatMessage(text) {
-    if (!chatState.currentPeerId) {
-        showChatError('Open a chat target first');
-        return;
-    }
-    if (!text) return;
-
-    const res = await fetch('/chat/send', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ recipientId: chatState.currentPeerId, text })
-    });
-
-    const json = await res.json();
-    if (!res.ok) {
-        showChatError(json.error || 'Send failed');
-        return;
-    }
-
-    if (json.message) {
-        appendChatMessage(json.message);
-        if (json.message.id > chatState.lastMessageId) chatState.lastMessageId = json.message.id;
-    }
-}
-
-async function pollChatLoop() {
-    if (!chatState.currentUserId) return;
-    try {
-        const res = await fetch(`/chat/poll?since=${chatState.lastMessageId}`, {
-            method: 'GET',
-            credentials: 'include'
-        });
-        if (res.ok) {
-            const data = await res.json();
-            if (Array.isArray(data.messages) && data.messages.length) {
-                data.messages.sort((a, b) => a.id - b.id).forEach(message => {
-                    if (message.id > chatState.lastMessageId) chatState.lastMessageId = message.id;
-                    if (message.fromUserId === chatState.currentPeerId || message.toUserId === chatState.currentPeerId) {
-                        appendChatMessage(message);
-                    }
-                });
-            }
-        }
-    } catch (err) {
-        console.warn('Chat poll failed', err);
-    } finally {
-        setTimeout(pollChatLoop, 100);
-    }
-}
-
-function startChatPolling() {
-    if (!chatState.currentUserId || chatState.polling) return;
-    chatState.polling = true;
-    pollChatLoop();
-}
 
 
     let friendList = document.getElementById("friendList");
@@ -847,8 +898,6 @@ function startChatPolling() {
 
     if (userInfo && userInfo.userName) {
         userName.innerHTML = `${userInfo.userName}'s Garage`;
-        chatState.currentUserId = userInfo.id;
-        startChatPolling();
     } else {
         userName.innerHTML = "Unknown User";
     }
@@ -856,19 +905,6 @@ function startChatPolling() {
     document.getElementById('logoutButton').addEventListener('click', () => {
         window.location.href = '/logout';
     });
-
-    document.getElementById('chat-open-user-button').addEventListener('click', async () => {
-        await openChatByUsername();
-    });
-
-    document.getElementById('chat-form').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const text = document.getElementById('chat-input').value.trim();
-        if (!text) return;
-        await sendChatMessage(text);
-        document.getElementById('chat-input').value = '';
-    });
-
     let alertMessage = document.getElementById("alertMessage");
 
     document.getElementById('friendRequestButton').addEventListener('click', async (e) => {
@@ -908,3 +944,5 @@ function startChatPolling() {
     });
 // Expose global game object for external modules (e.g., race overlay logic)
 window.game = game;
+
+

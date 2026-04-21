@@ -1,10 +1,13 @@
-FROM node:20-slim
+FROM node:18-alpine
 
-WORKDIR /usr/src/app
+WORKDIR /app
+
 COPY package*.json ./
-RUN npm install --production
+
+RUN npm install
+
 COPY . .
 
-EXPOSE 8080
-ENV PORT=8080
+EXPOSE 3000
+
 CMD ["npm", "start"]

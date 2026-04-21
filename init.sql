@@ -1,19 +1,19 @@
 -- Create application user with proper permissions
-CREATE USER IF NOT EXISTS 'idle_rpm_main'@'%' IDENTIFIED BY 'cset155';
-GRANT ALL PRIVILEGES ON idlerpm.* TO 'idle_rpm_main'@'%';
+CREATE USER IF NOT EXISTS 'idle_user'@'%' IDENTIFIED BY 'userpassword';
+GRANT ALL PRIVILEGES ON idle_rpm.* TO 'idle_user'@'%';
 FLUSH PRIVILEGES;
 
--- Use the database
-USE idlerpm;
+-- Use the correct database
+USE idle_rpm;
 
 -- Create tables
 CREATE TABLE IF NOT EXISTS users(
-	id int primary key auto_increment not null,
+    id int primary key auto_increment not null,
     username varchar(100) not null,
     email varchar(100) not null,
     password_hash varchar(255) not null,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	last_login TIMESTAMP NULL
+    last_login TIMESTAMP NULL
 );
 
 CREATE TABLE IF NOT EXISTS game_saves (

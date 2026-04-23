@@ -1,30 +1,38 @@
 import 'dotenv/config';
 import mysql from 'mysql2/promise';
 
+let pool = null;
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,      // "db"
-  port: process.env.DB_PORT,      // 3306
-  user: process.env.DB_USER,      // idle_user
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+async function initDB() {
+  while (true) {
+    try {
+      console.log("Trying to connect to MySQL...");
 
-export default pool;
+      pool = mysql.createPool({
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT || 3306,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0,
+      });
 
+      const conn = await pool.getConnection();
+      conn.release();
 
-pool.getConnection()
-  .then((connection) => {
-    console.log('DB Connected');
-    connection.release();
-  })
-  .catch((err) => {
-    console.error('DB connection error:', err);
-    throw err;
-  });
+      console.log("MySQL connected");
+      break;
+
+    } catch (err) {
+      console.log("MySQL not ready, retrying in 3s...");
+      await new Promise(res => setTimeout(res, 3000));
+    }
+  }
+}
+
+await initDB();
 
 export const promisePool = pool;
-export { pool };
+export default pool;

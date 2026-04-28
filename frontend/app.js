@@ -747,22 +747,123 @@ function attachPendingHandlers() {
         });
     });
 }
+async function startPolling() {
+    if (!activePeerId) return;
 
+    const res = await fetch(`/chat/poll?since=${lastMessageId}`, {
+        credentials: "include"
+    });
+
+    const data = await res.json();
+
+    if (data.messages && data.messages.length > 0) {
+        const filtered = data.messages.filter(m =>
+            m.fromUserId == activePeerId || m.toUserId == activePeerId
+        );
+
+        if (filtered.length > 0) {
+            renderMessages(filtered);
+        }
+    }
+
+    setTimeout(startPolling, 200);
+}
+
+document.getElementById("chat-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const text = document.getElementById("chat-input").value.trim();
+    const recipientId = document.getElementById("recipient-id").value;
+
+    if (!text) return;
+
+    document.getElementById("chat-input").value = "";
+
+    await fetch("/chat/send", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            recipientId,
+            text
+        })
+    });
+
+});
+let activePeerId = null;
+let lastMessageId = 0;
 function attachMessageHandlers() {
-    
     document.querySelectorAll('.message-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
             const id = btn.dataset.id;
-            
-            await fetch(`/chat/conversation?peerId=${id}`, {
-                method: 'GET',
-                credentials: 'include'
-            });
-            
-            renderAcceptedRequests();
+            const name = btn.dataset.username || "Friend";
+
+            activePeerId = id;
+            lastMessageId = 0;
+
+            // Fill popup UI
+            document.getElementById("recipient-id").value = id;
+            document.getElementById("friendName").textContent = name;
+
+            // Show popup
+            document.getElementById("chat-popup").style.display = "block";
+
+            // Load messages
+            await loadConversation();
+
+            // Start live updates
+            startPolling();
         });
     });
 }
+async function loadConversation() {
+    const res = await fetch(`/chat/conversation?peerId=${activePeerId}`, {
+        credentials: "include"
+    });
+
+    const data = await res.json();
+    renderMessages(data.messages);
+}
+function renderMessages(messages) {
+    const list = document.querySelector(".message-list");
+
+    messages.forEach(msg => {
+        const wrapper = document.createElement("div");
+        wrapper.style.display = "flex";
+        wrapper.style.flexDirection = "column";
+        wrapper.style.margin = "6px 0";
+
+        const isMe = msg.fromUserId === window.loggedInUserId;
+
+        // Label
+        const label = document.createElement("div");
+        label.textContent = isMe ? "You" : msg.fromUsername;
+        label.style.fontSize = "0.75rem";
+        label.style.color = "#555";
+        label.style.marginBottom = "2px";
+        label.style.alignSelf = isMe ? "flex-end" : "flex-start";
+
+        // Bubble
+        const bubble = document.createElement("div");
+        bubble.textContent = msg.text;
+        bubble.style.padding = "8px 12px";
+        bubble.style.borderRadius = "10px";
+        bubble.style.maxWidth = "75%";
+        bubble.style.alignSelf = isMe ? "flex-end" : "flex-start";
+        bubble.style.background = isMe ? "#4caf50" : "#ddd";
+        bubble.style.color = isMe ? "white" : "black";
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(bubble);
+        list.appendChild(wrapper);
+
+        lastMessageId = Math.max(lastMessageId, msg.id);
+    });
+
+    list.scrollTop = list.scrollHeight;
+}
+
+
 
 // --- Data Loading ---
 async function loadActiveFriendships() {
@@ -795,7 +896,7 @@ async function renderAcceptedRequests() {
         row.classList.add('accepted-row');
         row.innerHTML = `
             <span>${friend.name}</span>
-            <button class="message-btn" data-id="${friend.id}">Message</button>
+            <button class="message-btn" data-username="${friend.name}" data-id="${friend.id}">Message</button>
         `;
         container.appendChild(row);
     });
@@ -849,6 +950,13 @@ async function renderPendingRequests() {
     const friendListClickArea = document.getElementById("friendListClickArea");
     dragWindow(friendListClickArea,friendList);
     dragWindow(friendClickArea,friendForm);
+    const messageClickArea = document.getElementById("messageClickArea");
+    let chatPop = document.getElementById("chat-popup");
+    dragWindow(messageClickArea,chatPop);
+    document.getElementById("chat-close").addEventListener("click", () => {
+        document.getElementById("chat-popup").style.display = "none";
+        activePeerId = null;
+    });
 
     let activeDrag = null;
     function dragWindow(handleEl, winEl) {

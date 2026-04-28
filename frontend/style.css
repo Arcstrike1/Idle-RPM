@@ -21,7 +21,7 @@
 }
 
 body {
-    background-image: url(/Game/images/mainBack.svg);
+    background-image: url(/images/mainBack.svg);
     background-color: rgb(96, 187, 255);
     background-repeat: repeat-x;
     background-size: auto 100%; 
@@ -59,14 +59,14 @@ body {
     border: 10px rgb(128, 56, 42) ridge;
     padding:15px;
     height:90vh;
-    background-image:url(/Game/images/wheelbackground.jpg);
+    background-image:url(/images/wheelbackground.jpg);
 }
 #smokeSpace{
     width:fit-content;
     height: fit-content;
 }
 #buyables{
-    background-image: url(/Game/images/garback.jpg);
+    background-image: url(/images/garback.jpg);
     display: flex;
     border: 10px rgb(128, 56, 42) ridge;
 }
@@ -96,13 +96,13 @@ body {
 .building-button{
     border-style: outset;
     border-width: 4px;
-    background-image: url(/Game/images/buttonbackground.png);
+    background-image: url(/images/buttonbackground.png);
     width:100%;
 }
 .nav-button{
     border-style: outset;
     border-width: 4px;
-    background-image: url(/Game/images/buttonbackground.png);
+    background-image: url(/images/buttonbackground.png);
 }
 .nav-button:hover{
     transition: .5s ease all;
@@ -111,7 +111,7 @@ body {
 .upgrade-button{
     border-style: outset;
     border-width: 4px;
-    background-image: url(/Game/images/buttonbackground.png);
+    background-image: url(/images/buttonbackground.png);
     width:100%;
 }
 .upgrades-list{
@@ -139,7 +139,7 @@ body {
     pointer-events: none;
 }
 #pendingRequestsContainer{
-    background-image: url(/Game/images/garback.jpg);
+    background-image: url(/images/garback.jpg);
     display: flex;
     border: 10px rgb(128, 56, 42) ridge;
 }
@@ -185,7 +185,7 @@ body {
 .reject-btn {
     border-style: outset;
     border-width: 4px;
-    background-image: url(/Game/images/buttonbackground.png);
+    background-image: url(/images/buttonbackground.png);
     padding: 4px 10px;
     margin-left: 6px;
     cursor: pointer;

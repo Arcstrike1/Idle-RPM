@@ -11,7 +11,7 @@
     height:70vh;
 }
 body{
-    background-image: url(/Game/images/mainBack.svg);
+    background-image: url(images/mainBack.svg);
     background-color: rgba(96, 187, 255);
     background-repeat: no-repeat;
     background-size: cover;

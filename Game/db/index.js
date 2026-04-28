@@ -1,33 +1,38 @@
 import 'dotenv/config';
 import mysql from 'mysql2/promise';
-import { Connector } from '@google-cloud/cloud-sql-connector';
 
-const connector = new Connector();
+let pool = null;
 
-const clientOpts = await connector.getOptions({
-  instanceConnectionName: process.env.CLOUD_SQL_INSTANCE,
-  ipType: 'PUBLIC', 
-});
+async function initDB() {
+  while (true) {
+    try {
+      console.log("Trying to connect to MySQL...");
 
-const pool = mysql.createPool({
-  ...clientOpts,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+      pool = mysql.createPool({
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT || 3306,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0,
+      });
 
-pool.getConnection()
-  .then((connection) => {
-    console.log('DB Connected');
-    connection.release();
-  })
-  .catch((err) => {
-    console.error('DB connection error:', err);
-    throw err;
-  });
+      const conn = await pool.getConnection();
+      conn.release();
+
+      console.log("MySQL connected");
+      break;
+
+    } catch (err) {
+      console.log("MySQL not ready, retrying in 3s...");
+      await new Promise(res => setTimeout(res, 3000));
+    }
+  }
+}
+
+await initDB();
 
 export const promisePool = pool;
-export { pool, connector };
+export default pool;

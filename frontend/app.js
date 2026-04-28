@@ -754,7 +754,7 @@ function attachMessageHandlers() {
         btn.addEventListener('click', async () => {
             const id = btn.dataset.id;
             
-            await fetch(`/users/messages?friendId=${id}`, {
+            await fetch(`/chat/conversation?peerId=${id}`, {
                 method: 'GET',
                 credentials: 'include'
             });

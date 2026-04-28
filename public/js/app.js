@@ -17,15 +17,15 @@ const game ={
         {
             name: "Driveway Mechanic",
             baseCost: 15,
-            baseRPS: 0.1,
+            baseRPS: 1,
             count: 0,
 
         },
         {
             name: "Garage Workshop",
             baseCost: 100,
-            baseRPS: 1,
-            count: 0
+            baseRPS: 3,
+            count: 0 
         },
         {
             name: "Mechanics Shop",
@@ -41,15 +41,21 @@ const game ={
         },
         {
             name: "Body Shop",
-            baseCost: 1500,
+            baseCost: 2000,
             baseRPS: 150,
             count: 0
         },
         {
             name: "Tuner",
-            baseCost: 2500,
+            baseCost: 5000,
             baseRPS: 300,
             count: 0,
+        },
+        {
+            name : "Tunelagoon",
+            baseCost: 10000,
+            baseRPS: 600,
+            count: 0
         }
     ],
     // list of upgrade objects
@@ -65,7 +71,7 @@ const game ={
         {
             name: "Tires",
             description: "Put on a set of new tires that double rubber production.",
-            baseCost: 250,
+            baseCost: 2500,
             unlocked:false,
             purchased:false,
             rpsMultiplier: 2,
@@ -76,29 +82,29 @@ const game ={
         {
             name: "Suspension",
             description: "Dialed suspension ensures constant contact",
-            baseCost: 500,
+            baseCost: 5000,
             unlocked: false,
             purchased:false,
             rpsMultiplier: 1.5,
             unlockCondition(){
-                return game.buildings[1].count >=10;
+                return game.buildings[1].count >=2;
             },
         },
         {
             name: "Drag Slicks",
             description: "These give you max grip making your clicks more powerful",
-            baseCost: 1000,
+            baseCost: 10000,
             unlocked:false,
             purchased:false,
             rpcMultiplier:2,
             unlockCondition(){
-                return game.buildings[3].count >= 5;
+                return game.buildings[3].count >= 3;
             },
         },
         {
             name: "Active Aero",
             description: "More aerodynamic body and active aero features a more powerful steady Rubber Per Second",
-            baseCost: 1500,
+            baseCost: 15000,
             unlocked: false,
             purchased:false,
             rpsMultiplier:1.25,
@@ -109,7 +115,7 @@ const game ={
         {
             name: "Turbo",
             description: "A powerful turbo boosting both Rubber per second and Rubber per click",
-            baseCost:2000,
+            baseCost:20000,
             unlocked: false,
             purchased: false,
             rpcMultiplier:1.15,
@@ -251,11 +257,17 @@ const game ={
 
     for (let i = 0; i < this.buildings.length; i++) {
         const building = this.buildings[i];
+
+        // Only show each building after the previous one has been purchased.
+        if (i > 0 && this.buildings[i - 1].count === 0) {
+            continue;
+        }
+
         const button = document.createElement("button");
         button.id = `building-${i}`;
         button.innerHTML = `
             <strong>${building.name}</strong><br>
-            Cost: ${building.baseCost}<br>
+            Cost: ${this.getBuildingCost(i)}<br>
             Production: ${building.baseRPS}/s<br>
             Owned: ${building.count}
         `;
@@ -288,6 +300,11 @@ const game ={
         }
     }
 },
+    getBuildingCost(index) {
+        const building = this.buildings[index];
+        const growthRate = 1.15; // 15% price increase per purchase
+        return Math.ceil(building.baseCost * Math.pow(growthRate, building.count));
+    },
     // calculate building cost
     // calculate building production
     // buy building
@@ -373,8 +390,9 @@ const game ={
     utils: {},
     buyBuilding(index) {
     const building = this.buildings[index];
-    if (this.state.rubber >= building.baseCost) {
-        this.state.rubber -= building.baseCost;
+    const cost = this.getBuildingCost(index);
+    if (this.state.rubber >= cost) {
+        this.state.rubber -= cost;
         building.count++;
         this.render();
     } else {

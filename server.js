@@ -20,7 +20,7 @@ app.use(express.static("frontend"));
 app.use("/Game", express.static(path.join(__dirname, "Game")));
 app.use(
   cors({
-    origin: "http://8.228.76.117:3000",
+    origin: "https://idle-rpm-backend-787616315807.us-east4.run.app",
     credentials: true,
   })
 );

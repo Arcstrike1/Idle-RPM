@@ -186,12 +186,12 @@ async function bootstrap() {
   app.post("/session/save", (req, res) => {
     if (!req.session) return res.status(500).json({ error: "Session not initialized" });
     req.session.data = req.body.save;
-    res.json({ ok: true, data: req.session.data });
+    res.json(req.session.data || {});
   });
 
   app.get("/session/save", (req, res) => {
     if (!req.session) return res.status(500).json({ error: "Session not initialized" });
-    res.json({ ok: true, data: req.session.data });
+    res.json(req.session.data || {});
   });
 
   app.get("/logout", (req, res) => {

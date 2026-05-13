@@ -443,6 +443,10 @@ const game ={
 
     for (let i = 0; i < this.buildings.length; i++) {
         const building = this.buildings[i];
+        // Only show each building after the previous one has been purchased.
+        if (i > 0 && this.buildings[i - 1].count === 0) {
+            continue;
+        }
         const button = document.createElement("button");
         button.id = `building-${i}`;
         button.innerHTML = `

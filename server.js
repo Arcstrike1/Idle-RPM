@@ -197,7 +197,7 @@ async function bootstrap() {
   app.get("/logout", (req, res) => {
     const data = req.session.data;
 
-    fetch(`${process.env.INTERNAL_URL}/users/save`, {
+    fetch(`/users/save`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

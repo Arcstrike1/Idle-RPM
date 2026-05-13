@@ -546,7 +546,7 @@ const game ={
             buffs: this.buffs
         };
 
-        const res = await fetch("/session/save", {
+        const res = await fetch("${process.env.INTERNAL_URL}/session/save", {
             method: "POST",
             headers: { 'Content-Type':'application/json' },
             credentials: 'include',
@@ -559,7 +559,7 @@ const game ={
 
     async load(req, res) {
             try {
-                const res = await fetch("/session/save", {
+                const res = await fetch("${process.env.INTERNAL_URL}/session/save", {
                 method: "GET",
                 credentials: "include"
                 });
@@ -588,7 +588,7 @@ const game ={
             
             } catch(e){
                 console.error("No session",e);
-                const res = await fetch("/users/save", {
+                const res = await fetch("${process.env.INTERNAL_URL}/users/save", {
                 method: "GET",
                 credentials: "include"
                 });
@@ -676,7 +676,7 @@ window.onload = async function(req,res) {
     game.init();
     // try to fetch server-side save for logged-in user
     try {
-        const res = await fetch('/users/save');
+        const res = await fetch('${process.env.INTERNAL_URL}/users/save');
         if (res.ok) {
             const data = await res.json();
             
@@ -728,7 +728,7 @@ function attachPendingHandlers() {
     document.querySelectorAll('.accept-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
             const id = btn.dataset.id;
-            await fetch('/users/acceptFriendship', {
+            await fetch('${process.env.INTERNAL_URL}/users/acceptFriendship', {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
@@ -741,7 +741,7 @@ function attachPendingHandlers() {
     document.querySelectorAll('.reject-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
             const id = btn.dataset.id;
-            await fetch('/users/rejectFriendship', {
+            await fetch('${process.env.INTERNAL_URL}/users/rejectFriendship', {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
@@ -754,7 +754,7 @@ function attachPendingHandlers() {
 async function startPolling() {
     if (!activePeerId) return;
 
-    const res = await fetch(`/chat/poll?since=${lastMessageId}`, {
+    const res = await fetch(`${process.env.INTERNAL_URL}/chat/poll?since=${lastMessageId}`, {
         credentials: "include"
     });
 
@@ -783,7 +783,7 @@ document.getElementById("chat-form").addEventListener("submit", async (e) => {
 
     document.getElementById("chat-input").value = "";
 
-    await fetch("/chat/send", {
+    await fetch("${process.env.INTERNAL_URL}/chat/send", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -821,7 +821,7 @@ function attachMessageHandlers() {
     });
 }
 async function loadConversation() {
-    const res = await fetch(`/chat/conversation?peerId=${activePeerId}`, {
+    const res = await fetch(`${process.env.INTERNAL_URL}/chat/conversation?peerId=${activePeerId}`, {
         credentials: "include"
     });
 
@@ -871,7 +871,7 @@ function renderMessages(messages) {
 
 // --- Data Loading ---
 async function loadActiveFriendships() {
-    const res = await fetch('/users/acceptedFriendships', {
+    const res = await fetch('${process.env.INTERNAL_URL}/users/acceptedFriendships', {
         method: 'GET',
         credentials: 'include'
     });
@@ -880,7 +880,7 @@ async function loadActiveFriendships() {
 }
 
 async function loadPendingRequests() {
-    const res = await fetch('/users/pendingFriendships', {
+    const res = await fetch('${process.env.INTERNAL_URL}/users/pendingFriendships', {
         method: 'GET',
         credentials: 'include'
     });
@@ -992,7 +992,7 @@ async function renderPendingRequests() {
 
     let userInfo = null;
     try {
-        const res = await fetch('/users/userName', {
+        const res = await fetch('${process.env.INTERNAL_URL}/users/userName', {
             method: 'GET',
             credentials: 'include'
         });
@@ -1027,7 +1027,7 @@ async function renderPendingRequests() {
             const formdata = new FormData(friendFormFields);
             const data = Object.fromEntries(formdata.entries());
 
-            const res = await fetch("users/addFriend", {
+            const res = await fetch("${process.env.INTERNAL_URL}users/addFriend", {
                 method: "POST",
                 credentials: "include",
                 headers: {

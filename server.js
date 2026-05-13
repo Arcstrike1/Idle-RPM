@@ -8,7 +8,7 @@ import expressMySQLSession from "express-mysql-session";
 import { promisePool } from "./Game/db/index.js";
 import { getUserByUserId, getUserByUsername } from "./Game/queries/dbQueries.js";
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -20,7 +20,7 @@ app.use(express.static("frontend"));
 app.use("/Game", express.static(path.join(__dirname, "Game")));
 app.use(
   cors({
-    origin: "https://idle-rpm-backend-787616315807.us-east4.run.app",
+    origin: [/https:\/\/idle-rpm-backend.*\.run\.app/],
     credentials: true,
   })
 );
@@ -197,7 +197,7 @@ async function bootstrap() {
   app.get("/logout", (req, res) => {
     const data = req.session.data;
 
-    fetch(`http://localhost:${PORT}/users/save`, {
+    fetch(`${process.env.INTERNAL_URL}/users/save`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -210,10 +210,10 @@ async function bootstrap() {
     });
   });
 
-  app.listen(PORT, () => {
-    console.log("Serving Game folder from:", path.join(__dirname, "Game"));
-    console.log(`Server listening on port http://localhost:${PORT}/`);
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server listening on port ${PORT}`);
   });
+
 }
 
 bootstrap();
